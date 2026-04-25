@@ -23,7 +23,7 @@ st.set_page_config(
 # ── Load Custom CSS ─────────────────────────────────────
 css_path = Path(__file__).parent / "assets" / "style.css"
 if css_path.exists():
-    with open(css_path) as f:
+    with open(css_path, encoding="utf-8") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # ── Sidebar Navigation ─────────────────────────────────
@@ -136,7 +136,7 @@ if page == "🏠 Home":
     # Quick start buttons
     col1, col2, col3 = st.columns(3)
     with col2:
-        if st.button("🚀 Start Screening", use_container_width=True, type="primary"):
+        if st.button("🚀 Start Screening", width="stretch", type="primary"):
             st.session_state["nav"] = "screening"
             st.rerun()
 
@@ -193,7 +193,7 @@ elif page == "🔬 Screening":
             key="symptoms"
         )
 
-        if st.button("🔍 Run Risk Assessment", type="primary", use_container_width=True):
+        if st.button("🔍 Run Risk Assessment", type="primary", width="stretch"):
             with st.spinner("Analyzing patient data..."):
                 from ml.risk_scorer import RiskScorer
                 from ml.symptom_classifier import SymptomClassifier
@@ -268,7 +268,7 @@ elif page == "🔬 Screening":
 
             col1, col2 = st.columns([1, 1])
             with col1:
-                st.image(image, caption="Input Fundus Image", use_container_width=True)
+                st.image(image, caption="Input Fundus Image", width="stretch")
 
             with col2:
                 with st.spinner("Analyzing retinal image..."):
@@ -393,7 +393,7 @@ elif page == "📊 Results":
                     xaxis=dict(gridcolor="#333", zeroline=True, zerolinecolor="#666"),
                     yaxis=dict(gridcolor="#333"),
                 )
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, width="stretch")
 
                 # Factor details table
                 st.markdown("#### Factor Details")
@@ -404,7 +404,7 @@ elif page == "📊 Results":
                     "decreases_risk": "⬇️ Decreases Risk"
                 })
                 df.columns = ["Feature", "Value", "Contribution %", "Direction"]
-                st.dataframe(df, use_container_width=True, hide_index=True)
+                st.dataframe(df, width="stretch", hide_index=True)
 
         # ── Fundus Result ───────────────────────────────
         if fundus_result:
@@ -443,7 +443,7 @@ elif page == "📊 Results":
                     font=dict(color="#ccc"),
                     margin=dict(l=20, r=20, t=10, b=40),
                 )
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, width="stretch")
 
         # ── Symptom Result ──────────────────────────────
         if symptom_result:
@@ -486,7 +486,7 @@ elif page == "📋 Patient Records":
         import pandas as pd
         df = pd.DataFrame(patients)
         display_cols = [c for c in ["id", "name", "age", "sex", "village", "district", "created_at"] if c in df.columns]
-        st.dataframe(df[display_cols], use_container_width=True, hide_index=True)
+        st.dataframe(df[display_cols], width="stretch", hide_index=True)
 
 
 elif page == "📈 Dashboard":
@@ -535,7 +535,7 @@ elif page == "📈 Dashboard":
                 font=dict(color="#ccc"),
                 showlegend=False,
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
         else:
             st.info("No screening data yet. Run screenings to see distribution.")
 
@@ -557,7 +557,7 @@ elif page == "📈 Dashboard":
                 xaxis_title="DR Grade",
                 yaxis_title="Count",
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
         else:
             st.info("No DR screening data yet.")
 
