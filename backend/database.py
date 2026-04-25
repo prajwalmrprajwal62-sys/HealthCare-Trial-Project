@@ -8,9 +8,24 @@ Syncs to ABHA when connectivity is available.
 import sqlite3
 import json
 import uuid
+import numpy as np
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, List, Dict, Any
+
+
+class NumpyEncoder(json.JSONEncoder):
+    """JSON encoder that handles numpy types (float32, int64, ndarray, etc)."""
+    def default(self, obj):
+        if isinstance(obj, (np.integer,)):
+            return int(obj)
+        if isinstance(obj, (np.floating,)):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, np.bool_):
+            return bool(obj)
+        return super().default(obj)
 
 
 class DrishtiDB:
@@ -112,6 +127,11 @@ class DrishtiDB:
         """Save a screening result. Returns screening ID."""
         screening_id = str(uuid.uuid4())[:8]
 
+        # Ensure risk_score is a Python float (not numpy float32)
+        risk_score = screening_data.get("risk_score")
+        if risk_score is not None:
+            risk_score = float(risk_score)
+
         with sqlite3.connect(self.db_path) as conn:
             conn.execute(
                 """INSERT INTO screenings
@@ -122,12 +142,12 @@ class DrishtiDB:
                     screening_id,
                     patient_id,
                     screening_data.get("screening_type", "combined"),
-                    screening_data.get("risk_score"),
+                    risk_score,
                     screening_data.get("risk_level"),
                     screening_data.get("dr_grade"),
-                    json.dumps(screening_data.get("symptoms", [])),
-                    json.dumps(screening_data.get("vitals", {})),
-                    json.dumps(screening_data),
+                    json.dumps(screening_data.get("symptoms", []), cls=NumpyEncoder),
+                    json.dumps(screening_data.get("vitals", {}), cls=NumpyEncoder),
+                    json.dumps(screening_data, cls=NumpyEncoder),
                     screening_data.get("recommendation"),
                     1 if screening_data.get("referral_needed") else 0,
                 )
@@ -232,6 +252,68 @@ class DrishtiDB:
                 "SELECT * FROM sync_queue WHERE status = 'pending' ORDER BY ROWID"
             ).fetchall()
             return [dict(row) for row in rows]
+
+    def save_screening_result(
+        self,
+        vitals: Dict[str, Any],
+        risk_result: Dict[str, Any],
+        symptom_result: Dict[str, Any] = None,
+        fundus_result: Dict[str, Any] = None,
+        patient_name: str = "Walk-in Patient",
+    ) -> Dict[str, str]:
+        """
+        Save a complete screening result — creates patient + screening + referral in one call.
+
+        Args:
+            vitals: Patient vitals dict
+            risk_result: Risk scoring result
+            symptom_result: Optional symptom classification
+            fundus_result: Optional fundus analysis
+            patient_name: Patient name
+
+        Returns:
+            dict with patient_id, screening_id, and optional referral_id
+        """
+        # Create patient
+        patient_id = self.create_patient({
+            "name": patient_name,
+            "age": vitals.get("age"),
+            "sex": "M" if vitals.get("sex") == 1 else "F",
+            "village": "Walk-in",
+            "district": "Mandya",
+        })
+
+        # Create screening
+        screening_data = {
+            "screening_type": "combined",
+            "risk_score": risk_result.get("risk_score"),
+            "risk_level": risk_result.get("risk_level"),
+            "vitals": vitals,
+            "recommendation": risk_result.get("recommendation"),
+            "referral_needed": risk_result.get("risk_level") in ("HIGH", "CRITICAL"),
+        }
+
+        if symptom_result:
+            screening_data["symptoms"] = symptom_result.get("symptoms_detected", [])
+
+        if fundus_result:
+            screening_data["dr_grade"] = fundus_result.get("dr_grade")
+
+        screening_id = self.save_screening(patient_id, screening_data)
+
+        result = {"patient_id": patient_id, "screening_id": screening_id}
+
+        # Auto-create referral for high risk
+        if risk_result.get("risk_level") in ("HIGH", "CRITICAL"):
+            referral_id = self.create_referral(
+                patient_id, screening_id,
+                referred_to="Mandya District Hospital",
+                urgency="emergency" if risk_result.get("risk_level") == "CRITICAL" else "urgent",
+                notes=f"AI Risk Score: {risk_result.get('risk_score')}/10"
+            )
+            result["referral_id"] = referral_id
+
+        return result
 
     def seed_demo_data(self):
         """Seed database with demo data for presentation."""

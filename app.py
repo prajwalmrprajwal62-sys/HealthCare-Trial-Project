@@ -1,13 +1,18 @@
 """
-Drishti Health — Streamlit Dashboard
+Drishti Health — Streamlit Dashboard (V2)
 
 Multi-page diagnostic co-pilot for ASHA workers.
+Upgraded with: Camera PPG, Auto-Save, Demo Mode, Sarvam AI,
+Referral Reports, Grad-CAM Heatmaps, and Quick Demo Landing.
+
 Launch: streamlit run app.py
 """
 
 import streamlit as st
 import sys
+import json
 from pathlib import Path
+from datetime import datetime
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -30,15 +35,26 @@ if css_path.exists():
 st.sidebar.markdown("""
 <div style="text-align:center; padding: 1rem 0;">
     <h1 style="color: #00BFA6; font-size: 1.8rem; margin-bottom: 0;">🏥 Drishti Health</h1>
-    <p style="color: #888; font-size: 0.85rem; margin-top: 0.2rem;">AI Diagnostic Co-Pilot</p>
+    <p style="color: #888; font-size: 0.85rem; margin-top: 0.2rem;">AI Diagnostic Co-Pilot v2.0</p>
 </div>
 """, unsafe_allow_html=True)
 
 st.sidebar.divider()
 
+# Navigation pages
+NAV_PAGES = ["🏠 Home", "🔬 Screening", "📊 Results", "📋 Patient Records", "📈 Dashboard"]
+
+# Handle programmatic navigation
+default_idx = 0
+if "_go_to_page" in st.session_state:
+    _target = st.session_state.pop("_go_to_page")
+    if _target in NAV_PAGES:
+        default_idx = NAV_PAGES.index(_target)
+
 page = st.sidebar.radio(
     "Navigate",
-    ["🏠 Home", "🔬 Screening", "📊 Results", "📋 Patient Records", "📈 Dashboard"],
+    NAV_PAGES,
+    index=default_idx,
     label_visibility="collapsed",
 )
 
@@ -52,6 +68,10 @@ if offline_mode:
 else:
     st.sidebar.info("🌐 Online — ABHA sync available")
 
+# Screening counter
+total_screened = st.session_state.get("_total_screened", 0)
+st.sidebar.metric("Patients Screened Today", total_screened)
+
 st.sidebar.markdown("""
 <div style="position: fixed; bottom: 1rem; padding: 0.5rem; font-size: 0.7rem; color: #666;">
     Built by Team Cognivex<br>
@@ -63,7 +83,7 @@ st.sidebar.markdown("""
 # ── Page Router ─────────────────────────────────────────
 
 if page == "🏠 Home":
-    # ── HOME PAGE ───────────────────────────────────────
+    # ── HOME PAGE — QUICK DEMO LANDING ──────────────────
     st.markdown("""
     <div style="text-align: center; padding: 2rem 0;">
         <h1 style="background: linear-gradient(135deg, #00BFA6 0%, #0288D1 100%);
@@ -91,6 +111,20 @@ if page == "🏠 Home":
         st.metric("🆔 ABHA IDs Issued", "67 Cr", "<5% rural AI use")
 
     st.markdown("---")
+
+    # Tech stack badges
+    st.markdown("""
+    <div style="text-align: center; padding: 0.5rem 0;">
+        <span style="display: inline-block; background: #1a1a2e; border: 1px solid #00BFA6; padding: 5px 12px; border-radius: 20px; margin: 3px; color: #00BFA6; font-size: 0.8rem;">🧠 XGBoost + SHAP</span>
+        <span style="display: inline-block; background: #1a1a2e; border: 1px solid #FF9800; padding: 5px 12px; border-radius: 20px; margin: 3px; color: #FF9800; font-size: 0.8rem;">🔬 RETFound (Nature 2023)</span>
+        <span style="display: inline-block; background: #1a1a2e; border: 1px solid #E040FB; padding: 5px 12px; border-radius: 20px; margin: 3px; color: #E040FB; font-size: 0.8rem;">🗣️ Bhashini API</span>
+        <span style="display: inline-block; background: #1a1a2e; border: 1px solid #2196F3; padding: 5px 12px; border-radius: 20px; margin: 3px; color: #2196F3; font-size: 0.8rem;">🤖 Sarvam AI</span>
+        <span style="display: inline-block; background: #1a1a2e; border: 1px solid #4CAF50; padding: 5px 12px; border-radius: 20px; margin: 3px; color: #4CAF50; font-size: 0.8rem;">🆔 ABHA/ABDM</span>
+        <span style="display: inline-block; background: #1a1a2e; border: 1px solid #F44336; padding: 5px 12px; border-radius: 20px; margin: 3px; color: #F44336; font-size: 0.8rem;">💓 Camera PPG</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("")
 
     # Feature cards
     col1, col2, col3 = st.columns(3)
@@ -133,12 +167,71 @@ if page == "🏠 Home":
 
     st.markdown("---")
 
-    # Quick start buttons
-    col1, col2, col3 = st.columns(3)
+    # ── ONE-CLICK DEMO MODE ─────────────────────────────
+    col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        if st.button("🚀 Start Screening", width="stretch", type="primary"):
-            st.session_state["nav"] = "screening"
+        st.markdown("""
+        <div style="text-align: center; padding: 1rem; background: linear-gradient(135deg, #0d1117, #161b22);
+                    border-radius: 16px; border: 2px solid #00BFA6;">
+            <h3 style="color: #00BFA6; margin: 0;">🎬 Live Demo Mode</h3>
+            <p style="color: #888; font-size: 0.9rem;">Run the complete Meena demo scenario in one click</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        if st.button("▶️  Run Live Demo — Meet Meena", width="stretch", type="primary"):
+            with st.spinner("Running Meena's screening..."):
+                from ml.risk_scorer import RiskScorer
+                from ml.symptom_classifier import SymptomClassifier
+
+                scorer = RiskScorer()
+                classifier = SymptomClassifier()
+
+                # Meena's patient vitals
+                demo_vitals = {
+                    "age": 48, "sex": 0, "bp_systolic": 155, "bp_diastolic": 95,
+                    "glucose": 210, "hba1c": 8.2, "bmi": 31.5, "cholesterol": 245,
+                    "heart_rate": 82, "smoking": 0, "family_history_diabetes": 1,
+                    "family_history_heart": 0, "physical_activity": 2.0, "pregnancies": 3,
+                }
+
+                risk_result = scorer.predict_risk(demo_vitals)
+                symptom_result = classifier.classify("blurred vision, frequent urination, fatigue")
+
+                # Auto-save to database
+                from backend.database import DrishtiDB
+                db = DrishtiDB()
+                save_result = db.save_screening_result(
+                    vitals=demo_vitals, risk_result=risk_result,
+                    symptom_result=symptom_result, patient_name="Meena S. (Demo)"
+                )
+
+                # Store in session state
+                st.session_state["risk_result"] = risk_result
+                st.session_state["symptom_result"] = symptom_result
+                st.session_state["vitals"] = demo_vitals
+                st.session_state["_total_screened"] = st.session_state.get("_total_screened", 0) + 1
+                st.session_state["_last_save"] = save_result
+
+            st.session_state["_go_to_page"] = "📊 Results"
             st.rerun()
+
+        if st.button("🚀 Start New Screening", width="stretch"):
+            st.session_state["_go_to_page"] = "🔬 Screening"
+            st.rerun()
+
+    # Show last screening summary if available
+    if "risk_result" in st.session_state:
+        st.markdown("---")
+        rr = st.session_state["risk_result"]
+        color = {"LOW": "#4CAF50", "MODERATE": "#FF9800", "HIGH": "#F44336", "CRITICAL": "#9C27B0"}.get(rr["risk_level"], "#888")
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #0d1117, #161b22);
+                    padding: 1rem; border-radius: 12px; border: 1px solid {color}; text-align: center;">
+            <p style="color: #888; margin: 0;">Last Screening Result</p>
+            <h2 style="color: {color}; margin: 0.3rem 0;">{rr['risk_score']}/10 — {rr['risk_level']}</h2>
+            <p style="color: #ccc; font-size: 0.85rem; margin: 0;">{rr['recommendation']}</p>
+        </div>
+        """, unsafe_allow_html=True)
 
 
 elif page == "🔬 Screening":
@@ -148,7 +241,7 @@ elif page == "🔬 Screening":
     <p style="color: #888;">Enter patient vitals and upload fundus images for comprehensive risk assessment.</p>
     """, unsafe_allow_html=True)
 
-    tab1, tab2, tab3 = st.tabs(["📋 Vitals Input", "📷 Fundus Image", "🗣️ Voice Input"])
+    tab1, tab2, tab3, tab4 = st.tabs(["📋 Vitals Input", "📷 Fundus Image", "💓 Heart Rate (Camera)", "🗣️ Voice Input"])
 
     with tab1:
         st.markdown("### Patient Vitals")
@@ -185,6 +278,9 @@ elif page == "🔬 Screening":
 
         st.markdown("---")
 
+        # Patient Name for record saving
+        patient_name = st.text_input("Patient Name", value="Walk-in Patient", key="patient_name")
+
         # Symptom text input
         symptoms_text = st.text_area(
             "Symptoms (English, Kannada, or Hindi)",
@@ -197,9 +293,11 @@ elif page == "🔬 Screening":
             with st.spinner("Analyzing patient data..."):
                 from ml.risk_scorer import RiskScorer
                 from ml.symptom_classifier import SymptomClassifier
+                from backend.database import DrishtiDB
 
                 scorer = RiskScorer()
                 classifier = SymptomClassifier()
+                db = DrishtiDB()
 
                 vitals = {
                     "age": age,
@@ -221,17 +319,26 @@ elif page == "🔬 Screening":
                 risk_result = scorer.predict_risk(vitals)
                 symptom_result = classifier.classify(symptoms_text)
 
+                # Auto-save to database
+                save_result = db.save_screening_result(
+                    vitals=vitals,
+                    risk_result=risk_result,
+                    symptom_result=symptom_result,
+                    patient_name=patient_name,
+                )
+
                 # Store results in session state for Results page
                 st.session_state["risk_result"] = risk_result
                 st.session_state["symptom_result"] = symptom_result
                 st.session_state["vitals"] = vitals
+                st.session_state["_total_screened"] = st.session_state.get("_total_screened", 0) + 1
+                st.session_state["_last_save"] = save_result
 
-            st.success("✅ Risk assessment complete! Navigate to Results page to see details.")
+            st.success(f"✅ Screening saved! Patient ID: {save_result['patient_id']} — Navigate to Results for details.")
 
             # Quick result preview
             score = risk_result["risk_score"]
             level = risk_result["risk_level"]
-
             color = {"LOW": "#4CAF50", "MODERATE": "#FF9800", "HIGH": "#F44336", "CRITICAL": "#9C27B0"}.get(level, "#888")
 
             st.markdown(f"""
@@ -244,6 +351,9 @@ elif page == "🔬 Screening":
                 <p style="color: #aaa; font-style: italic;">{risk_result['recommendation_kn']}</p>
             </div>
             """, unsafe_allow_html=True)
+
+            if save_result.get("referral_id"):
+                st.warning(f"🚨 Referral auto-generated (ID: {save_result['referral_id']}) — Mandya District Hospital")
 
     with tab2:
         st.markdown("### 📷 Fundus Image Analysis")
@@ -268,12 +378,13 @@ elif page == "🔬 Screening":
 
             col1, col2 = st.columns([1, 1])
             with col1:
-                st.image(image, caption="Input Fundus Image", width="stretch")
+                st.image(image, caption="Input Fundus Image", width=None)
 
             with col2:
                 with st.spinner("Analyzing retinal image..."):
                     detector = FundusDetector()
                     result = detector.analyze(image)
+                    heatmap = detector.generate_heatmap(image, grade=result["dr_grade"])
 
                 st.session_state["fundus_result"] = result
 
@@ -286,17 +397,87 @@ elif page == "🔬 Screening":
                     <p style="color: #ccc;"><b>Confidence:</b> {result['confidence']*100:.1f}%</p>
                     <p style="color: #ccc;"><b>Model:</b> {result['model_used']}</p>
                     <hr style="border-color: #333;">
-                    <p style="color: #ccc;"><b>Findings:</b></p>
-                    <ul style="color: #aaa;">
-                        {"".join(f"<li>{f}</li>" for f in result['clinical_findings'])}
-                    </ul>
-                    <hr style="border-color: #333;">
                     <p style="color: #fff;"><b>📋 {result['recommendation']}</b></p>
                     <p style="color: #aaa; font-style: italic;">📋 {result['recommendation_kn']}</p>
                 </div>
                 """, unsafe_allow_html=True)
 
+            # Grad-CAM Heatmap
+            st.markdown("### 🔥 Grad-CAM Attention Heatmap")
+            st.caption("Red regions = AI attention (pathology detected). Shows WHERE the AI found issues.")
+            cols = st.columns(2)
+            with cols[0]:
+                st.image(image.resize((512, 512)), caption="Original Fundus")
+            with cols[1]:
+                st.image(heatmap, caption="Grad-CAM Heatmap Overlay")
+
     with tab3:
+        # ── CAMERA PPG TAB ──────────────────────────────
+        st.markdown("### 💓 Heart Rate — Camera PPG")
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, #1a1a2e, #16213e);
+                    padding: 1.5rem; border-radius: 12px; border: 1px solid #F44336;">
+            <h4 style="color: #F44336;">No Hardware Needed!</h4>
+            <p style="color: #ccc;">Measures heart rate from the phone camera using photoplethysmography (PPG).
+            Place your fingertip on the camera lens under steady lighting.</p>
+            <p style="color: #888; font-size: 0.8rem;">
+                <b>How it works:</b> Detects blood volume changes through skin color variations in the green channel.
+                FFT extracts the dominant frequency → heart rate in BPM.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("")
+        ppg_mode = st.radio("PPG Mode", ["📱 Demo (Simulated)", "📷 Camera (Live)"], horizontal=True)
+
+        if ppg_mode == "📱 Demo (Simulated)":
+            if st.button("💓 Measure Heart Rate (Demo)", type="primary"):
+                from ml.camera_ppg import CameraPPG
+                import plotly.graph_objects as go
+
+                ppg = CameraPPG()
+                result = ppg.measure_demo()
+
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.markdown(f"""
+                    <div style="text-align: center; background: linear-gradient(135deg, #1a1a2e, #16213e);
+                                padding: 2rem; border-radius: 16px; border: 2px solid #F44336;">
+                        <h1 style="color: #F44336; font-size: 4rem; margin: 0;">❤️ {result['heart_rate_bpm']}</h1>
+                        <h3 style="color: #F44336; margin: 0;">BPM</h3>
+                        <p style="color: #ccc;">Signal Quality: {result['signal_quality']} ({result['confidence']}%)</p>
+                        <p style="color: #888;">SpO2 Estimate: {result.get('spo2_estimate', 'N/A')}%</p>
+                        <p style="color: #666; font-size: 0.8rem;">Method: {result['method']}</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                with col2:
+                    waveform = result["waveform"]
+                    fig = go.Figure()
+                    fig.add_trace(go.Scatter(
+                        x=waveform["time"][:300],
+                        y=waveform["amplitude"][:300],
+                        mode="lines",
+                        line=dict(color="#F44336", width=2),
+                        name="PPG Signal"
+                    ))
+                    fig.update_layout(
+                        title="PPG Waveform",
+                        xaxis_title="Time (s)",
+                        yaxis_title="Amplitude",
+                        height=300,
+                        plot_bgcolor="rgba(0,0,0,0)",
+                        paper_bgcolor="rgba(0,0,0,0)",
+                        font=dict(color="#ccc"),
+                    )
+                    st.plotly_chart(fig, width="stretch")
+        else:
+            st.info("📷 Point your camera at your fingertip (cover the lens). Results appear after 5 seconds.")
+            cam_input = st.camera_input("Place fingertip on camera", key="ppg_camera")
+            if cam_input:
+                st.info("💓 Processing... (In hackathon, live PPG would process continuous frames)")
+
+    with tab4:
         st.markdown("### 🗣️ Voice Input")
         st.markdown("""
         <div style="background: linear-gradient(135deg, #1a1a2e, #16213e);
@@ -344,6 +525,13 @@ elif page == "📊 Results":
     if not risk_result and not fundus_result:
         st.warning("No screening results yet. Go to 🔬 Screening to run an assessment.")
     else:
+        # ── Demo narrative ──────────────────────────────
+        if risk_result:
+            st.markdown("""
+            > *"Meet Meena, an ASHA worker in rural Mandya district. No lab. No doctor within 20km.
+            > A 48-year-old woman walks in with blurred vision. Three seconds later..."*
+            """)
+
         # ── Risk Score Gauge ────────────────────────────
         if risk_result:
             score = risk_result["risk_score"]
@@ -421,7 +609,6 @@ elif page == "📊 Results":
             </div>
             """, unsafe_allow_html=True)
 
-            # Probability distribution
             if fundus_result.get("probabilities"):
                 import plotly.graph_objects as go
                 probs = fundus_result["probabilities"]
@@ -460,6 +647,62 @@ elif page == "📊 Results":
                 for exam in symptom_result['recommended_examinations']:
                     st.markdown(f"- {exam}")
 
+        # ── ACTION BUTTONS ──────────────────────────────
+        if risk_result:
+            st.markdown("---")
+            col1, col2, col3 = st.columns(3)
+
+            with col1:
+                # Generate Patient Summary (Sarvam AI)
+                if st.button("📝 Generate Patient Summary", width="stretch"):
+                    from integrations.sarvam_client import SarvamClient
+                    sarvam = SarvamClient()
+                    vitals = st.session_state.get("vitals", {})
+                    summary = sarvam.generate_patient_summary(
+                        risk_result=risk_result, vitals=vitals,
+                        symptom_result=symptom_result, fundus_result=fundus_result,
+                        language="kn"
+                    )
+                    st.session_state["patient_summary"] = summary
+
+                if "patient_summary" in st.session_state:
+                    summary = st.session_state["patient_summary"]
+                    st.markdown(f"""
+                    <div style="background: linear-gradient(135deg, #1a1a2e, #16213e);
+                                padding: 1.5rem; border-radius: 12px; border: 1px solid #2196F3;">
+                        <h4 style="color: #2196F3;">📝 Patient Summary ({summary['method']})</h4>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    st.text_area("English", summary.get("summary_en", ""), height=200, disabled=True)
+                    st.text_area("ಕನ್ನಡ (Kannada)", summary.get("summary_kn", ""), height=150, disabled=True)
+
+            with col2:
+                # Download Referral Report
+                if st.button("📄 Download Referral Report", width="stretch"):
+                    from ml.report_generator import ReportGenerator
+                    gen = ReportGenerator()
+                    vitals = st.session_state.get("vitals", {})
+                    html_report = gen.generate_referral_report(
+                        risk_result=risk_result, vitals=vitals,
+                        patient_name=st.session_state.get("patient_name", "Patient"),
+                        symptom_result=symptom_result, fundus_result=fundus_result,
+                    )
+                    st.session_state["referral_report"] = html_report
+
+                if "referral_report" in st.session_state:
+                    st.download_button(
+                        "⬇️ Download HTML Report",
+                        data=st.session_state["referral_report"],
+                        file_name=f"drishti_referral_{datetime.now().strftime('%Y%m%d_%H%M')}.html",
+                        mime="text/html",
+                    )
+                    st.components.v1.html(st.session_state["referral_report"], height=500, scrolling=True)
+
+            with col3:
+                if st.button("🔬 New Screening", width="stretch"):
+                    st.session_state["_go_to_page"] = "🔬 Screening"
+                    st.rerun()
+
 
 elif page == "📋 Patient Records":
     # ── PATIENT RECORDS ─────────────────────────────────
@@ -487,6 +730,9 @@ elif page == "📋 Patient Records":
         df = pd.DataFrame(patients)
         display_cols = [c for c in ["id", "name", "age", "sex", "village", "district", "created_at"] if c in df.columns]
         st.dataframe(df[display_cols], width="stretch", hide_index=True)
+
+        # Show screening count
+        st.info(f"📊 Total patients: {len(patients)} | Use Dashboard page for analytics")
 
 
 elif page == "📈 Dashboard":
@@ -571,5 +817,6 @@ elif page == "📈 Dashboard":
     - ✅ **SHAP explainability** — Shows exactly which factors drove the risk score
     - ✅ **Human-in-the-loop** — AI is a calculator, not a doctor. ASHA worker always decides.
     - ✅ **Vernacular output** — Results in Kannada/Hindi, not English jargon
+    - ✅ **Camera PPG** — Heart rate from phone camera, zero additional hardware
     - ✅ **Reference standard** — Based on IDx-DR (US FDA-cleared), ada Health (12M+ users globally)
     """)

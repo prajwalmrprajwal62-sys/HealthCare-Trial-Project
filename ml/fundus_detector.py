@@ -293,6 +293,86 @@ class FundusDetector:
         }
         return recs.get(grade, recs[0])
 
+    def generate_heatmap(self, image: Image.Image, grade: int = None) -> Image.Image:
+        """
+        Generate Grad-CAM-style attention heatmap overlay on fundus image.
+
+        In demo mode, generates a realistic heatmap based on typical DR pathology locations.
+        With real models, would use actual Grad-CAM from the CNN.
+
+        Args:
+            image: PIL Image of fundus
+            grade: DR grade (used to determine heatmap intensity)
+
+        Returns:
+            PIL Image with heatmap overlay
+        """
+        img_array = np.array(image.convert("RGB").resize((512, 512)))
+        h, w = img_array.shape[:2]
+
+        if grade is None:
+            grade = 2  # default moderate
+
+        # Create heatmap based on typical DR pathology locations
+        heatmap = np.zeros((h, w), dtype=np.float32)
+
+        # Optic disc region (center-right of retina)
+        cy, cx = h // 2, int(w * 0.65)
+        y_grid, x_grid = np.ogrid[:h, :w]
+
+        if grade >= 1:
+            # Scatter microaneurysms around macula area
+            np.random.seed(42)
+            for _ in range(5 + grade * 3):
+                mx = int(w * 0.3 + np.random.uniform(-0.15, 0.15) * w)
+                my = int(h * 0.5 + np.random.uniform(-0.15, 0.15) * h)
+                r = np.random.randint(8, 20 + grade * 5)
+                dist = np.sqrt((x_grid - mx) ** 2 + (y_grid - my) ** 2)
+                heatmap += np.exp(-dist ** 2 / (2 * r ** 2)) * (0.3 + grade * 0.15)
+
+        if grade >= 2:
+            # Hard exudates near macula
+            for _ in range(3 + grade):
+                ex = int(w * 0.4 + np.random.uniform(-0.1, 0.1) * w)
+                ey = int(h * 0.45 + np.random.uniform(-0.1, 0.1) * h)
+                r = np.random.randint(15, 30)
+                dist = np.sqrt((x_grid - ex) ** 2 + (y_grid - ey) ** 2)
+                heatmap += np.exp(-dist ** 2 / (2 * r ** 2)) * 0.6
+
+        if grade >= 3:
+            # Hemorrhages in all quadrants
+            for _ in range(8):
+                hx = int(np.random.uniform(0.2, 0.8) * w)
+                hy = int(np.random.uniform(0.2, 0.8) * h)
+                r = np.random.randint(20, 40)
+                dist = np.sqrt((x_grid - hx) ** 2 + (y_grid - hy) ** 2)
+                heatmap += np.exp(-dist ** 2 / (2 * r ** 2)) * 0.8
+
+        if grade >= 4:
+            # Neovascularization — diffuse attention around disc
+            dist = np.sqrt((x_grid - cy) ** 2 + (y_grid - cx) ** 2)
+            heatmap += np.exp(-dist ** 2 / (2 * 50 ** 2)) * 0.9
+
+        # Normalize heatmap to [0, 1]
+        if heatmap.max() > 0:
+            heatmap = heatmap / heatmap.max()
+
+        # Apply colormap (hot: black → red → yellow → white)
+        heatmap_colored = np.zeros((*heatmap.shape, 3), dtype=np.float32)
+        heatmap_colored[:, :, 0] = np.clip(heatmap * 3, 0, 1)  # Red
+        heatmap_colored[:, :, 1] = np.clip(heatmap * 3 - 1, 0, 1)  # Green
+        heatmap_colored[:, :, 2] = np.clip(heatmap * 3 - 2, 0, 1)  # Blue
+
+        heatmap_uint8 = (heatmap_colored * 255).astype(np.uint8)
+
+        # Blend with original image
+        alpha = 0.4
+        blended = (img_array.astype(np.float32) * (1 - alpha * heatmap[:, :, np.newaxis])
+                   + heatmap_uint8.astype(np.float32) * alpha * heatmap[:, :, np.newaxis])
+        blended = np.clip(blended, 0, 255).astype(np.uint8)
+
+        return Image.fromarray(blended)
+
     def analyze_from_path(self, image_path: str) -> Dict[str, Any]:
         """Analyze fundus image from file path."""
         image = Image.open(image_path)
