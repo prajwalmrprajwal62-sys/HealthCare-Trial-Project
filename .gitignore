@@ -1,0 +1,23 @@
+# Environment
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Models & Data (large files)
+models/*.pkl
+models/*.pt
+models/*.tflite
+data/*.db
+datasets/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Vosk models
+voice/models/

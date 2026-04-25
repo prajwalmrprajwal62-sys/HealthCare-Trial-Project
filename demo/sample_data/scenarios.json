@@ -1,0 +1,76 @@
+{
+    "demo_scenario_1": {
+        "name": "Meena's Patient — High Risk Diabetic",
+        "description": "48-year-old woman from Mandya with blurred vision. Classic demo case.",
+        "vitals": {
+            "age": 48,
+            "sex": 0,
+            "bp_systolic": 155,
+            "bp_diastolic": 95,
+            "glucose": 210,
+            "hba1c": 8.2,
+            "bmi": 31.5,
+            "cholesterol": 245,
+            "heart_rate": 82,
+            "smoking": 0,
+            "family_history_diabetes": 1,
+            "family_history_heart": 0,
+            "physical_activity": 2,
+            "pregnancies": 3
+        },
+        "symptoms": "blurred vision, frequent urination, fatigue",
+        "symptoms_kn": "ಮಸುಕಾದ ದೃಷ್ಟಿ, ಆಗಾಗ್ಗೆ ಮೂತ್ರ ವಿಸರ್ಜನೆ, ಸುಸ್ತು",
+        "expected_risk_level": "HIGH",
+        "expected_dr_grade": 2,
+        "expected_referral": true
+    },
+    "demo_scenario_2": {
+        "name": "Healthy Young Adult — Low Risk",
+        "description": "25-year-old male, routine screening. Shows the system works for low risk too.",
+        "vitals": {
+            "age": 25,
+            "sex": 1,
+            "bp_systolic": 118,
+            "bp_diastolic": 76,
+            "glucose": 95,
+            "hba1c": 5.2,
+            "bmi": 22.5,
+            "cholesterol": 180,
+            "heart_rate": 68,
+            "smoking": 0,
+            "family_history_diabetes": 0,
+            "family_history_heart": 0,
+            "physical_activity": 7,
+            "pregnancies": 0
+        },
+        "symptoms": "headache",
+        "expected_risk_level": "LOW",
+        "expected_dr_grade": 0,
+        "expected_referral": false
+    },
+    "demo_scenario_3": {
+        "name": "Elderly Hypertensive — Moderate Risk",
+        "description": "65-year-old male smoker with high BP. Good for showing gradient of risk.",
+        "vitals": {
+            "age": 65,
+            "sex": 1,
+            "bp_systolic": 168,
+            "bp_diastolic": 102,
+            "glucose": 135,
+            "hba1c": 6.8,
+            "bmi": 28.5,
+            "cholesterol": 260,
+            "heart_rate": 88,
+            "smoking": 1,
+            "family_history_diabetes": 0,
+            "family_history_heart": 1,
+            "physical_activity": 3,
+            "pregnancies": 0
+        },
+        "symptoms": "chest pain, dizziness, shortness of breath",
+        "symptoms_kn": "ಎದೆ ನೋವು, ತಲೆ ತಿರುಗುವಿಕೆ, ಉಸಿರಾಟದ ತೊಂದರೆ",
+        "expected_risk_level": "HIGH",
+        "expected_dr_grade": 1,
+        "expected_referral": true
+    }
+}

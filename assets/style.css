@@ -1,0 +1,214 @@
+/* ═══════════════════════════════════════════════════
+   DRISHTI HEALTH — Custom Streamlit Theme
+   Premium dark theme with medical green accents
+   ═══════════════════════════════════════════════════ */
+
+/* ── Root Variables ────────────────────────────────── */
+:root {
+    --primary: #00BFA6;
+    --primary-dark: #009688;
+    --accent: #0288D1;
+    --danger: #F44336;
+    --warning: #FF9800;
+    --success: #4CAF50;
+    --critical: #9C27B0;
+    --bg-dark: #0d1117;
+    --bg-card: #161b22;
+    --bg-surface: #1a1a2e;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --border: #30363d;
+    --glow: rgba(0, 191, 166, 0.15);
+}
+
+/* ── Main App Background ──────────────────────────── */
+.stApp {
+    background: linear-gradient(180deg, #0d1117 0%, #161b22 50%, #0d1117 100%) !important;
+}
+
+/* ── Sidebar ──────────────────────────────────────── */
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0d1117, #161b22) !important;
+    border-right: 1px solid var(--border) !important;
+}
+
+[data-testid="stSidebar"] .stRadio > div {
+    gap: 4px;
+}
+
+[data-testid="stSidebar"] .stRadio label {
+    padding: 0.6rem 1rem !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease !important;
+}
+
+[data-testid="stSidebar"] .stRadio label:hover {
+    background: var(--glow) !important;
+}
+
+/* ── Metrics Cards ────────────────────────────────── */
+[data-testid="stMetric"] {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+    padding: 1rem 1.2rem !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+[data-testid="stMetric"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px var(--glow);
+}
+
+[data-testid="stMetricValue"] {
+    font-size: 1.8rem !important;
+    font-weight: 700 !important;
+    color: var(--primary) !important;
+}
+
+[data-testid="stMetricLabel"] {
+    font-size: 0.85rem !important;
+    color: var(--text-secondary) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ── Buttons ──────────────────────────────────────── */
+.stButton > button {
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.3px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border: 1px solid var(--border) !important;
+}
+
+.stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, #00BFA6, #0288D1) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 2px 12px rgba(0, 191, 166, 0.3) !important;
+}
+
+.stButton > button[kind="primary"]:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 20px rgba(0, 191, 166, 0.4) !important;
+}
+
+/* ── Tabs ─────────────────────────────────────────── */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 4px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    padding: 0.5rem 1.2rem !important;
+}
+
+.stTabs [aria-selected="true"] {
+    background: var(--glow) !important;
+    color: var(--primary) !important;
+}
+
+/* ── Inputs ───────────────────────────────────────── */
+.stNumberInput input,
+.stTextInput input,
+.stTextArea textarea {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    color: var(--text-primary) !important;
+}
+
+.stNumberInput input:focus,
+.stTextInput input:focus,
+.stTextArea textarea:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 2px var(--glow) !important;
+}
+
+/* ── Sliders ──────────────────────────────────────── */
+.stSlider [data-baseweb="slider"] [role="slider"] {
+    background: var(--primary) !important;
+    border: 2px solid var(--primary-dark) !important;
+}
+
+/* ── Data Tables ──────────────────────────────────── */
+.stDataFrame {
+    border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+    overflow: hidden;
+}
+
+/* ── Dividers ─────────────────────────────────────── */
+hr {
+    border-color: var(--border) !important;
+}
+
+/* ── Alerts ───────────────────────────────────────── */
+.stAlert {
+    border-radius: 10px !important;
+    border: 1px solid var(--border) !important;
+}
+
+/* ── File Uploader ────────────────────────────────── */
+[data-testid="stFileUploader"] {
+    border: 2px dashed var(--border) !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    transition: border-color 0.3s ease;
+}
+
+[data-testid="stFileUploader"]:hover {
+    border-color: var(--primary) !important;
+}
+
+/* ── Scrollbar ────────────────────────────────────── */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+/* ── Plotly Chart Background ──────────────────────── */
+.stPlotlyChart {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* ── Animations ───────────────────────────────────── */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.stMarkdown, [data-testid="stMetric"] {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* ── Select box ───────────────────────────────────── */
+.stSelectbox > div > div {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+}
+
+/* ── Toggle ───────────────────────────────────────── */
+.stToggle label span {
+    font-weight: 500;
+}
