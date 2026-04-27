@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drishti Health — AI Diagnostic Co-Pilot for Rural India | Team Cognivex</title>
+<meta name="description" content="Drishti Health: AI-powered offline diagnostic co-pilot for ASHA workers. Retinopathy detection in 3 seconds. Built by Team Cognivex at Vibeathon 2025.">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+<style>
+:root{--bg-primary:#060d1a;--bg-secondary:#0c1a2e;--bg-card:#0f2240;--bg-card-hover:#132d52;--accent-primary:#00c6ff;--accent-secondary:#f59e0b;--success:#22c55e;--danger:#ef4444;--moderate:#f97316;--text-primary:#f0f6ff;--text-secondary:#7db3d8;--text-muted:#4a7a99;--border-subtle:rgba(0,198,255,0.12);--border-active:rgba(0,198,255,0.35);--glow-cyan:0 0 30px rgba(0,198,255,0.15);--glow-cyan-strong:0 0 50px rgba(0,198,255,0.3);--glow-amber:0 0 30px rgba(245,158,11,0.2);--glow-danger:0 0 30px rgba(239,68,68,0.2)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg-primary);color:var(--text-primary);font-family:'Plus Jakarta Sans',sans-serif;overflow-x:hidden}
+h1,h2,h3,h4{font-family:'Sora',sans-serif}
+.font-mono{font-family:'DM Mono',monospace}
+.card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:16px;transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s ease}
+.card:hover{transform:translateY(-6px) scale(1.01);box-shadow:var(--glow-cyan);border-color:var(--border-active)}
+@keyframes slideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+.section-card{animation:slideUp .6s ease-out forwards;opacity:0}
+.section-card:nth-child(1){animation-delay:.1s}
+.section-card:nth-child(2){animation-delay:.2s}
+.section-card:nth-child(3){animation-delay:.3s}
+.section-card:nth-child(4){animation-delay:.4s}
+.card-hover{transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s ease}
+.card-hover:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 20px 40px rgba(0,198,255,0.2)}
+@keyframes fadeScale{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.live-dot{animation:pulse-dot 1.5s ease-in-out infinite}
+.heart-3d{width:80px;height:72px;position:relative;animation:heartbeat3d 1.5s ease-in-out infinite;transform-style:preserve-3d;display:inline-block;margin-left:16px;vertical-align:middle}
+.heart-3d::before,.heart-3d::after{content:'';width:40px;height:64px;position:absolute;left:40px;top:0;background:linear-gradient(135deg,#ef4444,#f97316);border-radius:40px 40px 0 0;transform:rotate(-45deg);transform-origin:0 100%;box-shadow:0 0 20px rgba(239,68,68,0.4)}
+.heart-3d::after{left:0;transform:rotate(45deg);transform-origin:100% 100%;background:linear-gradient(135deg,#f97316,#ef4444)}
+@keyframes heartbeat3d{0%,100%{transform:scale(1) rotateY(0deg)}50%{transform:scale(1.12) rotateY(180deg)}}
+@keyframes float-dot{0%,100%{transform:translateY(0) translateX(0);opacity:.4}33%{transform:translateY(-20px) translateX(10px);opacity:.8}66%{transform:translateY(10px) translateX(-15px);opacity:.6}}
+.hero-dot{position:absolute;width:4px;height:4px;background:var(--accent-primary);border-radius:50%;animation:float-dot linear infinite}
+@keyframes bounce-arrow{0%,100%{transform:translateY(0)}50%{transform:translateY(12px)}}
+@keyframes ppg-pulse{0%,100%{border-color:rgba(34,197,94,0.3)}50%{border-color:rgba(34,197,94,0.8)}}
+.nav-link{position:relative;color:var(--text-secondary);transition:color .3s}
+.nav-link:hover,.nav-link.active{color:var(--accent-primary)}
+.nav-link.active::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:2px;background:var(--accent-primary);border-radius:2px}
+.section-title{font-family:'Sora',sans-serif;font-weight:800;font-size:2.5rem;margin-bottom:.5rem}
+.section-subtitle{font-family:'Sora',sans-serif;font-weight:600;color:var(--text-secondary);font-size:1.1rem;margin-bottom:2rem}
+.btn-primary{background:var(--accent-primary);color:var(--bg-primary);font-family:'Sora',sans-serif;font-weight:600;padding:12px 28px;border-radius:12px;border:none;cursor:pointer;box-shadow:var(--glow-cyan-strong);transition:transform .2s,box-shadow .2s}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 60px rgba(0,198,255,0.4)}
+.btn-secondary{background:transparent;color:var(--accent-primary);font-family:'Sora',sans-serif;font-weight:600;padding:12px 28px;border-radius:12px;border:1px solid var(--accent-primary);cursor:pointer;transition:all .2s}
+.btn-secondary:hover{background:rgba(0,198,255,0.1);transform:translateY(-2px)}
+.tech-pill{display:inline-block;padding:4px 12px;border:1px solid var(--border-subtle);border-radius:20px;font-family:'Sora',sans-serif;font-size:12px;font-weight:400;color:var(--text-secondary);margin:4px}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--bg-card);border:1px solid var(--border-active);border-radius:12px;padding:16px 24px;color:var(--text-primary);font-family:'Sora',sans-serif;z-index:9999;box-shadow:var(--glow-cyan);transform:translateX(400px);transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.toast.show{transform:translateX(0)}
+.tab-btn{padding:10px 20px;border:1px solid var(--border-subtle);border-radius:10px;background:transparent;color:var(--text-secondary);cursor:pointer;font-family:'Sora',sans-serif;font-weight:600;transition:all .3s}
+.tab-btn.active{background:rgba(0,198,255,0.1);border-color:var(--accent-primary);color:var(--accent-primary)}
+.slider-input{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:var(--bg-secondary);outline:none}
+.slider-input::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent-primary);cursor:pointer;box-shadow:0 0 10px rgba(0,198,255,0.4)}
+.hidden-section{display:none}
+.visible-section{display:block}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px}
+.hamburger span{width:24px;height:2px;background:var(--text-primary);transition:all .3s}
+@media(max-width:768px){.hamburger{display:flex}.nav-links{display:none;position:absolute;top:100%;left:0;right:0;background:rgba(6,13,26,0.95);backdrop-filter:blur(20px);flex-direction:column;padding:20px;gap:16px}.nav-links.open{display:flex}.section-title{font-size:1.8rem}}
+.animate-on-scroll{opacity:0;transform:translateY(30px);transition:opacity .6s,transform .6s}
+.animate-on-scroll.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar" style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(6,13,26,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border-subtle)">
+<div style="max-width:1400px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between">
+<a href="#hero" style="font-family:'Sora',sans-serif;font-weight:700;color:var(--accent-primary);font-size:1.2rem;text-decoration:none">🔬 Drishti Health</a>
+<div class="hamburger" onclick="document.querySelector('.nav-links').classList.toggle('open')"><span></span><span></span><span></span></div>
+<div class="nav-links" style="display:flex;align-items:center;gap:20px;font-family:'Sora',sans-serif;font-size:13px;font-weight:600">
+<a href="#features" class="nav-link" style="text-decoration:none">Features</a>
+<a href="#demo" class="nav-link" style="text-decoration:none">Demo</a>
+<a href="#food" class="nav-link" style="text-decoration:none">Food+Diet</a>
+<a href="#medicine" class="nav-link" style="text-decoration:none">Medicine</a>
+<a href="#appointment" class="nav-link" style="text-decoration:none">Appointment</a>
+<a href="#map" class="nav-link" style="text-decoration:none">Map</a>
+<a href="#chatbot" class="nav-link" style="text-decoration:none">Chatbot</a>
+<a href="#chronicle" class="nav-link" style="text-decoration:none">Chronicle</a>
+<a href="#impact" class="nav-link" style="text-decoration:none">Impact</a>
+<a href="#team" class="nav-link" style="text-decoration:none">Team</a>
+<span style="padding:4px 12px;border-radius:20px;background:rgba(245,158,11,0.15);color:var(--accent-secondary);font-size:11px;font-weight:400;white-space:nowrap">Vibeathon 2025 | Track 1 Healthcare</span>
+</div>
+</div>
+</nav>
+
+<!-- HERO SECTION -->
+<section id="hero" style="min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:80px 24px">
+<div style="position:absolute;inset:0;overflow:hidden" id="hero-dots"></div>
+<div style="text-align:center;position:relative;z-index:1;max-width:900px">
+<div style="display:inline-block;padding:6px 18px;border-radius:20px;background:rgba(245,158,11,0.12);color:var(--accent-secondary);font-family:'Sora',sans-serif;font-size:13px;margin-bottom:24px">🏆 Hackathon MVP | Mysore 2025 | Team Cognivex</div>
+<h1 style="font-weight:800;font-size:clamp(2.5rem,6vw,4rem);line-height:1.1;margin-bottom:16px">Drishti Health <span class="heart-3d"></span></h1>
+<p style="font-family:'Sora',sans-serif;font-weight:600;font-size:clamp(1.1rem,2.5vw,1.5rem);color:var(--text-secondary);margin-bottom:16px">AI Diagnostic Co-Pilot for Rural India</p>
+<p style="font-size:1.1rem;color:var(--text-secondary);max-width:700px;margin:0 auto 32px;line-height:1.7">Turning any Android phone into an offline multi-disease screening assistant for ASHA workers — retinopathy detected in 3 seconds, in Kannada, without internet.</p>
+<div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:32px" id="hero-counters">
+<div class="card" style="padding:24px 32px;text-align:center"><span class="font-mono" style="font-size:2.5rem;font-weight:700;color:var(--accent-primary)" data-target="77" id="counter1">0</span><span class="font-mono" style="font-size:2.5rem;font-weight:700;color:var(--accent-primary)">M+</span><p style="color:var(--text-muted);font-size:13px;margin-top:4px">Diabetics in India</p></div>
+<div class="card" style="padding:24px 32px;text-align:center"><span class="font-mono" style="font-size:2.5rem;font-weight:700;color:var(--accent-secondary)" id="counter2">0</span><span class="font-mono" style="font-size:2.5rem;font-weight:700;color:var(--accent-secondary)"> Yrs</span><p style="color:var(--text-muted);font-size:13px;margin-top:4px">Avg. rural diagnosis delay</p></div>
+<div class="card" style="padding:24px 32px;text-align:center"><span class="font-mono" style="font-size:2.5rem;font-weight:700;color:var(--danger)">&lt;</span><span class="font-mono" style="font-size:2.5rem;font-weight:700;color:var(--danger)" id="counter3">0</span><span class="font-mono" style="font-size:2.5rem;font-weight:700;color:var(--danger)">%</span><p style="color:var(--text-muted);font-size:13px;margin-top:4px">PHCs with AI triage</p></div>
+</div>
+<div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:24px">
+<button class="btn-primary" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">▶ Run Live Demo</button>
+<button class="btn-secondary" onclick="document.getElementById('techstack').scrollIntoView({behavior:'smooth'})">View Tech Stack</button>
+</div>
+<div style="display:flex;justify-content:center;flex-wrap:wrap;gap:6px">
+<span class="tech-pill">YOLOv8</span><span class="tech-pill">RETFound</span><span class="tech-pill">XGBoost</span><span class="tech-pill">Bhashini</span><span class="tech-pill">Sarvam AI</span><span class="tech-pill">ABHA</span><span class="tech-pill">Anime.js</span><span class="tech-pill">SQLite</span>
+</div>
+</div>
+<div style="position:absolute;bottom:32px;left:50%;transform:translateX(-50%);animation:bounce-arrow 1.5s ease-in-out infinite;color:var(--text-muted);font-size:24px">↓</div>
+</section>
+
+<!-- PROBLEM SECTION -->
+<section id="features" style="padding:100px 24px;max-width:1200px;margin:0 auto">
+<div style="text-align:center;margin-bottom:48px">
+<h2 class="section-title animate-on-scroll">The Gap That Kills</h2>
+<p class="section-subtitle animate-on-scroll">India has the disease burden. But not the diagnostic infrastructure.</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;margin-bottom:48px">
+<div class="card card-hover animate-on-scroll" style="padding:32px;text-align:center;border-color:rgba(239,68,68,0.2)">
+<p class="font-mono" style="font-size:3rem;font-weight:700;color:var(--danger)">0.7 / 1000</p>
+<p style="color:var(--text-secondary);margin-top:8px">Doctors per 1,000 rural Indians. WHO minimum: 1:1,000</p>
+</div>
+<div class="card card-hover animate-on-scroll" style="padding:32px;text-align:center;border-color:rgba(245,158,11,0.2)">
+<p class="font-mono" style="font-size:3rem;font-weight:700;color:var(--accent-secondary)">4.5 Years</p>
+<p style="color:var(--text-secondary);margin-top:8px">Average time from first symptom to diabetes diagnosis in rural India</p>
+</div>
+<div class="card card-hover animate-on-scroll" style="padding:32px;text-align:center;border-color:rgba(0,198,255,0.2)">
+<p class="font-mono" style="font-size:3rem;font-weight:700;color:var(--accent-primary)">67 Crore</p>
+<p style="color:var(--text-secondary);margin-top:8px">ABHA IDs issued. But &lt;5% rural PHCs use AI diagnostic tools</p>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:24px">
+<div class="card animate-on-scroll" style="padding:28px;background:rgba(239,68,68,0.04);border-left:3px solid var(--danger)">
+<h3 style="font-weight:700;color:var(--danger);margin-bottom:16px">❌ Without Drishti</h3>
+<ul style="list-style:none;color:var(--text-secondary);line-height:2">
+<li>• ASHA worker with paper forms</li><li>• No diagnostic tools — guesswork only</li><li>• 4.5 year average diagnosis delay</li><li>• Referral to city hospital (hours away, rarely followed)</li><li>• No patient record trail — history lost</li>
+</ul>
+</div>
+<div class="card animate-on-scroll" style="padding:28px;background:rgba(34,197,94,0.04);border-left:3px solid var(--success)">
+<h3 style="font-weight:700;color:var(--success);margin-bottom:16px">✓ With Drishti</h3>
+<ul style="list-style:none;color:var(--text-secondary);line-height:2">
+<li>• ASHA worker with Android phone</li><li>• AI triage in 3 seconds (retinopathy detected offline)</li><li>• Referral letter generated and downloaded instantly</li><li>• Nearest hospital shown with distance and hours</li><li>• ABHA record synced to national health locker</li>
+</ul>
+</div>
+</div>
+</section>
+
+<!-- PLACEHOLDER FOR REMAINING SECTIONS - Will be populated by subsequent edits -->
+<!-- DEMO SECTION -->
+<section id="demo" style="padding:100px 24px;max-width:1200px;margin:0 auto">
+<div style="text-align:center;margin-bottom:16px">
+<h2 class="section-title animate-on-scroll">Meet Meena</h2>
+<p class="section-subtitle animate-on-scroll">48-year-old woman. Rural Mandya district, Karnataka. No lab. No internet. No doctor within 20km. She walked 3km to reach the ASHA worker.</p>
+<button class="btn-primary" onclick="autoRunDemo()" id="auto-run-btn" style="margin-bottom:32px">▶ Auto-Run Meena's Story</button>
+</div>
+<!-- Demo Tabs -->
+<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:24px">
+<button class="tab-btn active" onclick="switchDemoTab(0)" id="dtab0">📋 Patient Vitals</button>
+<button class="tab-btn" onclick="switchDemoTab(1)" id="dtab1">👁 Fundus Analysis</button>
+<button class="tab-btn" onclick="switchDemoTab(2)" id="dtab2">🎙 Voice Input</button>
+<button class="tab-btn" onclick="switchDemoTab(3)" id="dtab3">💓 Camera PPG</button>
+</div>
+<!-- Tab 1: Vitals -->
+<div id="demo-tab-0" class="card" style="padding:32px">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px">
+<div><label style="font-size:13px;color:var(--text-muted)">Patient Name</label><input id="v-name" type="text" value="" placeholder="Enter name" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary);margin-top:4px;font-family:'Plus Jakarta Sans'"></div>
+<div><label style="font-size:13px;color:var(--text-muted)">Age: <span class="font-mono" id="v-age-val">30</span></label><input id="v-age" type="range" min="18" max="90" value="30" class="slider-input" oninput="document.getElementById('v-age-val').textContent=this.value" style="margin-top:8px"></div>
+<div><label style="font-size:13px;color:var(--text-muted)">BP Systolic: <span class="font-mono" id="v-bps-val">120</span> mmHg</label><input id="v-bps" type="range" min="90" max="200" value="120" class="slider-input" oninput="document.getElementById('v-bps-val').textContent=this.value" style="margin-top:8px"></div>
+<div><label style="font-size:13px;color:var(--text-muted)">BP Diastolic: <span class="font-mono" id="v-bpd-val">80</span> mmHg</label><input id="v-bpd" type="range" min="60" max="130" value="80" class="slider-input" oninput="document.getElementById('v-bpd-val').textContent=this.value" style="margin-top:8px"></div>
+<div><label style="font-size:13px;color:var(--text-muted)">Blood Glucose: <span class="font-mono" id="v-bg-val">100</span> mg/dL</label><input id="v-bg" type="range" min="70" max="400" value="100" class="slider-input" oninput="document.getElementById('v-bg-val').textContent=this.value" style="margin-top:8px"></div>
+<div><label style="font-size:13px;color:var(--text-muted)">HbA1c: <span class="font-mono" id="v-hba1c-val">5.0</span>%</label><input id="v-hba1c" type="range" min="40" max="140" value="50" class="slider-input" oninput="document.getElementById('v-hba1c-val').textContent=(this.value/10).toFixed(1)" style="margin-top:8px"></div>
+<div><label style="font-size:13px;color:var(--text-muted)">BMI: <span class="font-mono" id="v-bmi-val">22.0</span> kg/m²</label><input id="v-bmi" type="range" min="150" max="450" value="220" class="slider-input" oninput="document.getElementById('v-bmi-val').textContent=(this.value/10).toFixed(1)" style="margin-top:8px"></div>
+<div style="display:flex;gap:24px;align-items:center"><label style="font-size:13px;color:var(--text-muted)">Smoking:</label><label style="cursor:pointer"><input id="v-smoke" type="checkbox" style="margin-right:6px">Yes</label></div>
+<div style="display:flex;gap:24px;align-items:center"><label style="font-size:13px;color:var(--text-muted)">Family History Diabetes:</label><label style="cursor:pointer"><input id="v-fam" type="checkbox" style="margin-right:6px">Yes</label></div>
+</div>
+<div style="text-align:center;margin-top:24px"><button class="btn-primary" onclick="runRiskAnalysis()">🔍 Run AI Risk Analysis</button></div>
+</div>
+<!-- Tab 2: Fundus -->
+<div id="demo-tab-1" class="card hidden-section" style="padding:32px">
+<div style="text-align:center">
+<div id="fundus-upload" style="width:280px;height:280px;border:2px dashed var(--accent-primary);border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);cursor:pointer;font-size:14px" onclick="showDemoFundus()">Click to upload or use demo</div>
+<button class="btn-secondary" onclick="showDemoFundus()" style="margin-bottom:16px">Use Demo Fundus Image</button>
+<div id="fundus-images" style="display:none;gap:24px;justify-content:center;flex-wrap:wrap;margin-bottom:16px">
+<div style="text-align:center"><p style="font-size:13px;color:var(--text-muted);margin-bottom:8px">Original</p><div style="width:200px;height:200px;border-radius:50%;background:radial-gradient(circle at 40% 45%,#ff6b35 0%,#c2410c 15%,#7f1d1d 35%,#1a0a00 70%,#0a0500 100%);margin:0 auto;border:2px solid var(--border-subtle)"></div></div>
+<div style="text-align:center"><p style="font-size:13px;color:var(--text-muted);margin-bottom:8px">AI Heatmap</p><div style="width:200px;height:200px;border-radius:50%;background:radial-gradient(circle at 40% 45%,#ff6b35 0%,#c2410c 15%,#7f1d1d 35%,#1a0a00 70%,#0a0500 100%);margin:0 auto;border:2px solid var(--border-subtle);position:relative;overflow:hidden"><div style="position:absolute;inset:0;border-radius:50%;background:radial-gradient(ellipse at 60% 45%,rgba(239,68,68,0.7) 0%,rgba(249,115,22,0.4) 30%,transparent 65%)"></div></div></div>
+</div>
+<div id="fundus-progress" style="display:none;margin:16px auto;max-width:400px"><div style="height:6px;border-radius:3px;background:var(--bg-secondary);overflow:hidden"><div id="fundus-bar" style="height:100%;width:0%;background:var(--accent-primary);border-radius:3px;transition:width 3s linear"></div></div><p style="font-size:13px;color:var(--text-muted);margin-top:8px">Scanning for lesions…</p></div>
+<button class="btn-primary" onclick="analyzeFundus()" id="fundus-btn">🔍 Analyze Fundus</button>
+<div id="fundus-result" style="display:none;margin-top:20px"><span style="display:inline-block;padding:8px 20px;border-radius:20px;background:rgba(249,115,22,0.15);color:var(--moderate);font-family:'Sora',sans-serif;font-weight:600">⚠️ Moderate Diabetic Retinopathy | Confidence: 78% | Lesions: 3 regions detected</span><p style="font-size:12px;color:var(--text-muted);margin-top:12px">Powered by YOLOv8-n + RETFound (Nature 2023) | Fine-tuned on IDRiD — Indian patient dataset</p></div>
+</div>
+</div>
+<!-- Tab 3: Voice -->
+<div id="demo-tab-2" class="card hidden-section" style="padding:32px;text-align:center">
+<div id="mic-btn" style="width:100px;height:100px;border-radius:50%;background:rgba(239,68,68,0.1);border:2px solid var(--danger);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;cursor:pointer;font-size:36px;transition:all .3s" onclick="playKannadaDemo()">🎙</div>
+<div id="waveform" style="display:flex;gap:4px;justify-content:center;align-items:end;height:40px;margin-bottom:20px"></div>
+<button class="btn-primary" onclick="playKannadaDemo()">▶ Play Kannada Demo</button>
+<div id="voice-steps" style="margin-top:24px;text-align:left;max-width:600px;margin-left:auto;margin-right:auto">
+<div id="vs1" style="display:none;padding:12px;border-radius:8px;background:rgba(0,198,255,0.05);margin-bottom:8px;color:var(--accent-primary);font-size:14px">🎙 Recording in Kannada…</div>
+<div id="vs2" style="display:none;padding:12px;border-radius:8px;background:rgba(0,198,255,0.05);margin-bottom:8px;font-size:16px" dir="ltr"></div>
+<div id="vs3" style="display:none;padding:12px;border-radius:8px;background:rgba(245,158,11,0.05);margin-bottom:8px;color:var(--accent-secondary);font-size:14px"></div>
+<div id="vs4" style="display:none;display:flex;gap:8px;flex-wrap:wrap"></div>
+</div>
+<p style="font-size:12px;color:var(--text-muted);margin-top:16px">Powered by Bhashini API — Government of India | 22 Indian languages | ASR + Translation + TTS</p>
+</div>
+<!-- Tab 4: PPG -->
+<div id="demo-tab-3" class="card hidden-section" style="padding:32px;text-align:center">
+<div style="width:200px;height:200px;border-radius:50%;border:3px solid rgba(34,197,94,0.3);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;background:var(--bg-secondary);animation:ppg-pulse 1s ease-in-out infinite"><span style="font-size:14px;color:var(--text-muted)">📷 Camera View</span></div>
+<p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Point camera at fingertip</p>
+<button class="btn-primary" onclick="startPPG()">▶ Start Heart Rate Measurement</button>
+<div id="ppg-result" style="display:none;margin-top:24px">
+<svg id="ecg-svg" width="100%" height="80" viewBox="0 0 400 80" style="max-width:500px;margin:0 auto"><path id="ecg-path" d="" stroke="#22c55e" stroke-width="2" fill="none"/></svg>
+<p class="font-mono" style="font-size:3rem;font-weight:700;color:var(--success);margin:12px 0">HR: <span id="ppg-hr">60</span> bpm</p>
+<span style="display:inline-block;padding:6px 16px;border-radius:20px;background:rgba(34,197,94,0.12);color:var(--success);font-family:'Sora',sans-serif;margin:4px">SpO2: 97%</span>
+<span style="display:inline-block;padding:6px 16px;border-radius:20px;background:rgba(34,197,94,0.12);color:var(--success);font-family:'Sora',sans-serif;margin:4px">Signal: Good <span class="live-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--success)"></span></span>
+<p style="font-size:12px;color:var(--text-muted);margin-top:12px">Uses phone camera green channel + photoplethysmography (PPG). Zero additional hardware.</p>
+</div>
+</div>
+<!-- Results Panel -->
+<div id="results-panel" style="display:none;margin-top:32px">
+<div class="card" style="padding:32px;margin-bottom:24px;text-align:center">
+<h3 style="font-weight:700;margin-bottom:20px">AI Risk Assessment</h3>
+<svg width="280" height="160" viewBox="0 0 280 160" style="margin:0 auto;display:block">
+<path d="M 30 140 A 110 110 0 0 1 250 140" fill="none" stroke="var(--bg-secondary)" stroke-width="20" stroke-linecap="round"/>
+<path d="M 30 140 A 110 110 0 0 1 97 38" fill="none" stroke="var(--success)" stroke-width="20" stroke-linecap="round"/>
+<path d="M 97 38 A 110 110 0 0 1 183 38" fill="none" stroke="var(--accent-secondary)" stroke-width="20" stroke-linecap="round"/>
+<path d="M 183 38 A 110 110 0 0 1 220 60" fill="none" stroke="var(--moderate)" stroke-width="20" stroke-linecap="round"/>
+<path d="M 220 60 A 110 110 0 0 1 250 140" fill="none" stroke="var(--danger)" stroke-width="20" stroke-linecap="round"/>
+<line id="gauge-needle" x1="140" y1="140" x2="140" y2="40" stroke="var(--text-primary)" stroke-width="3" stroke-linecap="round" transform="rotate(-90,140,140)"/>
+<circle cx="140" cy="140" r="6" fill="var(--text-primary)"/>
+</svg>
+<p class="font-mono" style="font-size:3rem;font-weight:700;color:var(--danger);margin-top:8px" id="risk-score-val">8.4 / 10</p>
+<span style="display:inline-block;padding:6px 18px;border-radius:20px;background:rgba(239,68,68,0.15);color:var(--danger);font-family:'Sora',sans-serif;font-weight:700">🔴 CRITICAL RISK</span>
+</div>
+<!-- SHAP Bars -->
+<div class="card" style="padding:32px;margin-bottom:24px">
+<h3 style="font-weight:700;margin-bottom:20px">Why this score? (AI Explanation)</h3>
+<div id="shap-bars">
+<div class="shap-row" style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><span style="min-width:160px;font-size:13px;color:var(--text-secondary)">HbA1c 8.2%</span><div style="flex:1;height:14px;border-radius:4px;background:var(--bg-secondary);overflow:hidden"><div class="shap-bar" style="height:100%;width:0%;background:var(--danger);border-radius:4px" data-width="85%"></div></div><span class="font-mono" style="color:var(--danger);font-size:13px">+2.8</span></div>
+<div class="shap-row" style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><span style="min-width:160px;font-size:13px;color:var(--text-secondary)">BP Systolic 155</span><div style="flex:1;height:14px;border-radius:4px;background:var(--bg-secondary);overflow:hidden"><div class="shap-bar" style="height:100%;width:0%;background:var(--moderate);border-radius:4px" data-width="72%"></div></div><span class="font-mono" style="color:var(--moderate);font-size:13px">+2.1</span></div>
+<div class="shap-row" style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><span style="min-width:160px;font-size:13px;color:var(--text-secondary)">Fundus: Moderate DR</span><div style="flex:1;height:14px;border-radius:4px;background:var(--bg-secondary);overflow:hidden"><div class="shap-bar" style="height:100%;width:0%;background:var(--moderate);border-radius:4px" data-width="65%"></div></div><span class="font-mono" style="color:var(--moderate);font-size:13px">+1.9</span></div>
+<div class="shap-row" style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><span style="min-width:160px;font-size:13px;color:var(--text-secondary)">Blood Glucose 210</span><div style="flex:1;height:14px;border-radius:4px;background:var(--bg-secondary);overflow:hidden"><div class="shap-bar" style="height:100%;width:0%;background:var(--accent-secondary);border-radius:4px" data-width="50%"></div></div><span class="font-mono" style="color:var(--accent-secondary);font-size:13px">+1.4</span></div>
+<div class="shap-row" style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><span style="min-width:160px;font-size:13px;color:var(--text-secondary)">Age 48</span><div style="flex:1;height:14px;border-radius:4px;background:var(--bg-secondary);overflow:hidden"><div class="shap-bar" style="height:100%;width:0%;background:var(--accent-secondary);border-radius:4px" data-width="35%"></div></div><span class="font-mono" style="color:var(--accent-secondary);font-size:13px">+0.8</span></div>
+<div class="shap-row" style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><span style="min-width:160px;font-size:13px;color:var(--text-secondary)">Family History: Yes</span><div style="flex:1;height:14px;border-radius:4px;background:var(--bg-secondary);overflow:hidden"><div class="shap-bar" style="height:100%;width:0%;background:var(--success);border-radius:4px" data-width="25%"></div></div><span class="font-mono" style="color:var(--success);font-size:13px">+0.5</span></div>
+</div>
+</div>
+<!-- Multi-disease cards -->
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-bottom:24px">
+<div class="card" style="padding:24px;border-color:rgba(239,68,68,0.3)"><span style="font-size:24px">🩸</span><h4 style="font-weight:700;margin:8px 0">Diabetes Risk</h4><p class="font-mono" style="color:var(--danger);font-size:1.5rem;font-weight:700">HIGH (87%)</p></div>
+<div class="card" style="padding:24px;border-color:rgba(245,158,11,0.3)"><span style="font-size:24px">❤️</span><h4 style="font-weight:700;margin:8px 0">Cardiac Risk</h4><p class="font-mono" style="color:var(--accent-secondary);font-size:1.5rem;font-weight:700">MODERATE (64%)</p></div>
+<div class="card" style="padding:24px;border-color:rgba(249,115,22,0.3)"><span style="font-size:24px">👁</span><h4 style="font-weight:700;margin:8px 0">Retinopathy</h4><p class="font-mono" style="color:var(--moderate);font-size:1.5rem;font-weight:700">Moderate DR (78%)</p></div>
+</div>
+<!-- Recommendation -->
+<div class="card" style="padding:24px;border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.04);margin-bottom:24px">
+<p style="line-height:1.8;color:var(--text-secondary)"><strong style="color:var(--accent-secondary)">⚠️ Immediate referral</strong> required to District Hospital Eye Department.<br>Actions: HbA1c retest within 2 weeks | Dilated fundus exam | Endocrinology consult | Daily BP monitoring.<br><span style="color:var(--success)">ABHA Record: ✓ Updated</span></p>
+</div>
+<!-- AI Summary -->
+<div class="card" style="padding:24px;border-color:rgba(0,198,255,0.3);margin-bottom:24px">
+<div style="display:flex;gap:12px;margin-bottom:12px"><button class="tab-btn active" onclick="showLang('en',this)" id="lang-en">English</button><button class="tab-btn" onclick="showLang('kn',this)" id="lang-kn">ಕನ್ನಡ</button></div>
+<p id="summary-en" style="color:var(--text-secondary);line-height:1.7">Meena shows signs of advanced uncontrolled diabetes with early-stage retinopathy. Immediate medical intervention is critical to prevent vision loss and cardiovascular complications.</p>
+<p id="summary-kn" style="color:var(--text-secondary);line-height:1.7;display:none">ಮೀನಾ ಅವರಿಗೆ ಮಧುಮೇಹ ಮತ್ತು ಕಣ್ಣಿನ ಸಮಸ್ಯೆ ಕಂಡುಬರುತ್ತಿದೆ. ತಕ್ಷಣ ವೈದ್ಯರನ್ನು ಭೇಟಿಯಾಗಿ. ಆಹಾರ ನಿಯಂತ್ರಣ ಅತ್ಯಗತ್ಯ.</p>
+<p style="font-size:12px;color:var(--text-muted);margin-top:8px">Powered by Sarvam AI — India's open-source Indic LLM, Bengaluru</p>
+</div>
+<!-- Action buttons -->
+<div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+<button class="btn-primary" onclick="downloadReferralReport()">📄 Download Referral Report</button>
+<button class="btn-primary" onclick="downloadResearchReport()">📋 Download Research Report</button>
+<button class="btn-secondary" onclick="window.open('https://wa.me/?text='+encodeURIComponent('Drishti Health Report for Meena Devi — Risk: 8.4/10 CRITICAL. Visit Mandya District Hospital immediately. ABHA record updated.'))">📲 Share via WhatsApp</button>
+<button class="btn-secondary" id="abha-sync-btn" onclick="syncABHA()">🔄 ABHA Sync</button>
+</div>
+</div>
+</section>
+<!-- REGISTRATION -->
+<section id="registration" style="padding:100px 24px;max-width:1200px;margin:0 auto">
+<div style="text-align:center;margin-bottom:48px"><h2 class="section-title animate-on-scroll">Patient Registration</h2><p class="section-subtitle animate-on-scroll">Every patient's health story starts with a record. Stored locally. Synced to ABHA when online.</p></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:24px">
+<div class="card" style="padding:28px"><h3 style="font-weight:700;margin-bottom:16px;color:var(--accent-primary)">Basic Info</h3>
+<div style="display:flex;flex-direction:column;gap:12px">
+<input id="r-name" placeholder="Full Name" style="padding:10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary)">
+<input id="r-age" type="number" placeholder="Age" style="padding:10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary)">
+<div style="display:flex;gap:12px;color:var(--text-secondary);font-size:14px"><label><input type="radio" name="gender" value="Male"> Male</label><label><input type="radio" name="gender" value="Female"> Female</label><label><input type="radio" name="gender" value="Other"> Other</label></div>
+<input id="r-phone" type="tel" placeholder="+91 XXXXX XXXXX" style="padding:10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary)">
+<input id="r-email" type="email" placeholder="patient@example.com" style="padding:10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary)">
+<input id="r-village" placeholder="Village / District / State" style="padding:10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary)">
+<input id="r-abha" placeholder="ABHA ID (optional)" style="padding:10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary)">
+<input id="r-emergency" placeholder="Emergency Contact Name + Phone" style="padding:10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary)">
+</div></div>
+<div class="card" style="padding:28px"><h3 style="font-weight:700;margin-bottom:16px;color:var(--accent-primary)">Health Background</h3>
+<p style="font-size:13px;color:var(--text-muted);margin-bottom:8px">Known Conditions:</p>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;color:var(--text-secondary);font-size:14px">
+<label><input type="checkbox" class="r-cond" value="Diabetes"> Diabetes</label><label><input type="checkbox" class="r-cond" value="Hypertension"> Hypertension</label><label><input type="checkbox" class="r-cond" value="Heart Disease"> Heart Disease</label><label><input type="checkbox" class="r-cond" value="Kidney Disease"> Kidney Disease</label><label><input type="checkbox" class="r-cond" value="None"> None</label>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;color:var(--text-secondary);font-size:14px">
+<label><input type="checkbox" id="r-smoke2"> Smoking</label><label><input type="checkbox" id="r-alcohol"> Alcohol</label><label><input type="checkbox" id="r-fam2"> Family history of diabetes</label>
+<textarea id="r-meds" placeholder="Current medications" rows="3" style="padding:10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary);resize:vertical"></textarea>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+<button class="btn-primary" onclick="saveProfile()" style="font-size:13px;padding:10px 20px">💾 Save Profile</button>
+<button class="btn-secondary" onclick="showToast('📧 Profile sent to email')" style="font-size:13px;padding:10px 20px">📧 Send to Email</button>
+<button class="btn-secondary" onclick="viewProfile()" style="font-size:13px;padding:10px 20px">👁 View Saved</button>
+</div>
+<p style="font-size:11px;color:var(--text-muted);margin-top:12px">Patient data stored locally. ABHA sync requires internet. No data leaves device without consent.</p>
+</div>
+</div>
+</section>
+
+<!-- FOOD & DIET -->
+<section id="food" style="padding:100px 24px;max-width:1200px;margin:0 auto">
+<div style="text-align:center;margin-bottom:48px"><h2 class="section-title animate-on-scroll">Food & Diet Tracker</h2><p class="section-subtitle animate-on-scroll">Personalized nutrition guidance for diabetic patients — in Kannada and English.</p></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:24px">
+<button class="tab-btn active" onclick="switchFoodTab(0)" id="ftab0">🥗 Food Log</button>
+<button class="tab-btn" onclick="switchFoodTab(1)" id="ftab1">🥦 AI Diet Plan</button>
+<button class="tab-btn" onclick="switchFoodTab(2)" id="ftab2">📊 Weekly Report</button>
+</div>
+<div id="food-tab-0" class="card" style="padding:28px">
+<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin-bottom:20px">
+<div><label style="font-size:13px;color:var(--text-muted)">Food Name</label><input id="food-name" list="food-list" placeholder="e.g. rice, idli" style="padding:8px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary);margin-top:4px;display:block"><datalist id="food-list"><option value="rice"><option value="roti"><option value="idli"><option value="dal"><option value="sambar"><option value="banana"><option value="apple"><option value="milk"><option value="tea with sugar"><option value="chapati"><option value="poha"><option value="upma"><option value="curd"><option value="egg"><option value="chicken curry"><option value="fish curry"><option value="biscuit"><option value="fruit juice"><option value="green vegetables"></datalist></div>
+<div><label style="font-size:13px;color:var(--text-muted)">Qty</label><input id="food-qty" type="number" value="1" min="1" style="padding:8px;width:60px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary);margin-top:4px;display:block"></div>
+<button class="btn-primary" onclick="addFoodItem()" style="padding:8px 20px;font-size:13px">Add</button>
+</div>
+<div id="food-log-list" style="margin-bottom:20px"></div>
+<div id="food-totals" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px"></div>
+<div id="food-warning" style="display:none;padding:10px;border-radius:8px;background:rgba(245,158,11,0.08);color:var(--accent-secondary);font-size:13px;margin-top:12px">⚠️ Sugar intake too high for a diabetic patient</div>
+</div>
+<div id="food-tab-1" class="card hidden-section" style="padding:28px">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:24px">
+<div style="padding:16px;border-radius:12px;background:rgba(0,198,255,0.04);border:1px solid var(--border-subtle)"><h4 style="color:var(--accent-primary);margin-bottom:8px">🌅 Morning (7–8 AM)</h4><p style="color:var(--text-secondary);font-size:14px;line-height:1.8">2 Idlis + Sambar + 1 cup green tea (no sugar)<br>OR: 1 bowl oats with low-fat milk</p></div>
+<div style="padding:16px;border-radius:12px;background:rgba(0,198,255,0.04);border:1px solid var(--border-subtle)"><h4 style="color:var(--accent-primary);margin-bottom:8px">☀️ Mid-Morning (10 AM)</h4><p style="color:var(--text-secondary);font-size:14px;line-height:1.8">1 apple or 5–6 almonds</p></div>
+<div style="padding:16px;border-radius:12px;background:rgba(0,198,255,0.04);border:1px solid var(--border-subtle)"><h4 style="color:var(--accent-primary);margin-bottom:8px">🍛 Lunch (1–2 PM)</h4><p style="color:var(--text-secondary);font-size:14px;line-height:1.8">2 Rotis + Dal + Sabzi + Curd<br>OR: Small bowl brown rice + Dal + Vegetables</p></div>
+<div style="padding:16px;border-radius:12px;background:rgba(0,198,255,0.04);border:1px solid var(--border-subtle)"><h4 style="color:var(--accent-primary);margin-bottom:8px">🌤 Evening (4 PM)</h4><p style="color:var(--text-secondary);font-size:14px;line-height:1.8">Roasted chana or cucumber slices</p></div>
+<div style="padding:16px;border-radius:12px;background:rgba(0,198,255,0.04);border:1px solid var(--border-subtle)"><h4 style="color:var(--accent-primary);margin-bottom:8px">🌙 Dinner (7–8 PM)</h4><p style="color:var(--text-secondary);font-size:14px;line-height:1.8">2 Rotis + Vegetable curry<br>OR: Moong dal khichdi + Curd</p></div>
+<div style="padding:16px;border-radius:12px;background:rgba(0,198,255,0.04);border:1px solid var(--border-subtle)"><h4 style="color:var(--accent-primary);margin-bottom:8px">🚶 Walk</h4><p style="color:var(--text-secondary);font-size:14px;line-height:1.8">30 minutes daily, preferably after dinner</p></div>
+</div>
+<div style="margin-bottom:16px"><p style="font-size:13px;color:var(--text-muted);margin-bottom:8px">❌ Avoid:</p><div style="display:flex;flex-wrap:wrap;gap:6px"><span style="padding:4px 12px;border-radius:20px;background:rgba(239,68,68,0.1);color:var(--danger);font-size:12px">White rice</span><span style="padding:4px 12px;border-radius:20px;background:rgba(239,68,68,0.1);color:var(--danger);font-size:12px">Sugar</span><span style="padding:4px 12px;border-radius:20px;background:rgba(239,68,68,0.1);color:var(--danger);font-size:12px">Maida</span><span style="padding:4px 12px;border-radius:20px;background:rgba(239,68,68,0.1);color:var(--danger);font-size:12px">Fried foods</span><span style="padding:4px 12px;border-radius:20px;background:rgba(239,68,68,0.1);color:var(--danger);font-size:12px">Fruit juices</span><span style="padding:4px 12px;border-radius:20px;background:rgba(239,68,68,0.1);color:var(--danger);font-size:12px">Sweets</span></div></div>
+<div style="margin-bottom:16px"><p style="font-size:13px;color:var(--text-muted);margin-bottom:8px">✅ Recommended:</p><div style="display:flex;flex-wrap:wrap;gap:6px"><span style="padding:4px 12px;border-radius:20px;background:rgba(34,197,94,0.1);color:var(--success);font-size:12px">Ragi</span><span style="padding:4px 12px;border-radius:20px;background:rgba(34,197,94,0.1);color:var(--success);font-size:12px">Brown rice</span><span style="padding:4px 12px;border-radius:20px;background:rgba(34,197,94,0.1);color:var(--success);font-size:12px">Dal</span><span style="padding:4px 12px;border-radius:20px;background:rgba(34,197,94,0.1);color:var(--success);font-size:12px">Vegetables</span><span style="padding:4px 12px;border-radius:20px;background:rgba(34,197,94,0.1);color:var(--success);font-size:12px">Low-fat curd</span><span style="padding:4px 12px;border-radius:20px;background:rgba(34,197,94,0.1);color:var(--success);font-size:12px">Fish</span></div></div>
+<div style="display:flex;gap:8px"><button class="btn-primary" onclick="showToast('📥 Diet plan downloaded')" style="font-size:13px;padding:8px 16px">📥 Download Diet Plan</button><button class="btn-secondary" onclick="showToast('📲 Sent to WhatsApp')" style="font-size:13px;padding:8px 16px">📲 Send to WhatsApp</button></div>
+</div>
+<div id="food-tab-2" class="card hidden-section" style="padding:28px">
+<h3 style="font-weight:700;margin-bottom:20px">Weekly Calorie Report</h3>
+<div id="weekly-chart" style="display:flex;align-items:end;gap:12px;height:200px;padding:20px 0;border-bottom:1px solid var(--border-subtle);margin-bottom:16px"></div>
+<div style="display:flex;gap:24px;flex-wrap:wrap;color:var(--text-secondary);font-size:14px"><span>Avg Daily: <strong class="font-mono" style="color:var(--accent-primary)">1,650 cal</strong></span><span>Avg Sugar: <strong class="font-mono" style="color:var(--accent-secondary)">22g</strong></span><span>Days on Target: <strong class="font-mono" style="color:var(--success)">5/7</strong></span></div>
+</div>
+</section>
+
+<!-- MEDICINE TRACKER -->
+<section id="medicine" style="padding:100px 24px;max-width:1200px;margin:0 auto">
+<div style="text-align:center;margin-bottom:48px"><h2 class="section-title animate-on-scroll">Medicine Tracker</h2><p class="section-subtitle animate-on-scroll">Never miss a dose. Track all medications. Get reminders on your phone.</p></div>
+<div class="card" style="padding:28px;margin-bottom:24px">
+<h3 style="font-weight:700;margin-bottom:16px">Add Medicine</h3>
+<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end">
+<div><label style="font-size:13px;color:var(--text-muted)">Medicine Name</label><input id="med-name" placeholder="e.g. Metformin 500mg" style="padding:8px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary);margin-top:4px;display:block"></div>
+<div><label style="font-size:13px;color:var(--text-muted)">Dose</label><input id="med-dose" placeholder="1 tablet" style="padding:8px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary);margin-top:4px;display:block;width:100px"></div>
+<div><label style="font-size:13px;color:var(--text-muted)">Frequency</label><select id="med-freq" style="padding:8px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary);margin-top:4px;display:block"><option>Once daily</option><option>Twice daily</option><option>Three times daily</option><option>As needed</option></select></div>
+<div style="display:flex;gap:8px;color:var(--text-secondary);font-size:13px"><label><input type="checkbox" id="med-morn" checked> Morning</label><label><input type="checkbox" id="med-aft"> Afternoon</label><label><input type="checkbox" id="med-nit"> Night</label></div>
+<div><label style="font-size:13px;color:var(--text-muted)">Stock</label><input id="med-stock" type="number" value="30" style="padding:8px;width:60px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary);margin-top:4px;display:block"></div>
+<button class="btn-primary" onclick="addMedicine()" style="padding:8px 20px;font-size:13px">➕ Add</button>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px" id="med-schedule">
+<div class="card" style="padding:20px"><h4 style="font-weight:700;color:var(--accent-secondary);margin-bottom:12px">🌅 Morning</h4><div id="med-morning"></div></div>
+<div class="card" style="padding:20px"><h4 style="font-weight:700;color:var(--accent-primary);margin-bottom:12px">☀️ Afternoon</h4><div id="med-afternoon"></div></div>
+<div class="card" style="padding:20px"><h4 style="font-weight:700;color:var(--text-secondary);margin-bottom:12px">🌙 Night</h4><div id="med-night"></div></div>
+</div>
+<div style="display:flex;gap:8px;margin-top:16px"><button class="btn-secondary" onclick="showToast('📧 Reminder set')" style="font-size:13px;padding:8px 16px">📧 Email Reminder</button><button class="btn-secondary" onclick="showToast('📱 WhatsApp reminder sent')" style="font-size:13px;padding:8px 16px">📱 WhatsApp Reminder</button></div>
+</section>
+<!-- CHATBOT -->
+<section id="chatbot" style="padding:100px 24px;max-width:800px;margin:0 auto">
+<div style="text-align:center;margin-bottom:48px"><h2 class="section-title animate-on-scroll">ದೃಷ್ಟಿ ಆರೋಗ್ಯ ಸಹಾಯಕ</h2><p class="section-subtitle animate-on-scroll">Drishti Assistant — Ask health questions in Kannada or English. Available offline.</p></div>
+<div class="card" style="padding:0;overflow:hidden">
+<div id="chat-messages" style="height:400px;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px">
+<div style="align-self:flex-start;max-width:80%;padding:12px 16px;border-radius:12px 12px 12px 4px;background:rgba(0,198,255,0.08);color:var(--text-secondary);font-size:14px">ನಮಸ್ಕಾರ! ನಾನು ದೃಷ್ಟಿ ಆರೋಗ್ಯ ಸಹಾಯಕ. ನಿಮ್ಮ ಆರೋಗ್ಯ ಬಗ್ಗೆ ಕೇಳಿ.</div>
+<div style="align-self:flex-end;max-width:80%;padding:12px 16px;border-radius:12px 12px 4px 12px;background:rgba(0,198,255,0.15);color:var(--text-primary);font-size:14px">ನನ್ನ ರಕ್ತದ ಸಕ್ಕರೆ 210 ಇದೆ. ಏನು ಮಾಡಲಿ?</div>
+<div style="align-self:flex-start;max-width:80%;padding:12px 16px;border-radius:12px 12px 12px 4px;background:rgba(0,198,255,0.08);color:var(--text-secondary);font-size:14px">210 mg/dL ಅಧಿಕ. ಮಧುಮೇಹ ಸೂಚಿಸಬಹುದು. ತಕ್ಷಣ PHC ಗೆ ಹೋಗಿ, HbA1c ಪರೀಕ್ಷೆ ಮಾಡಿ.</div>
+</div>
+<div style="display:flex;gap:6px;flex-wrap:wrap;padding:8px 20px;border-top:1px solid var(--border-subtle)">
+<button class="tech-pill" style="cursor:pointer;border-color:var(--accent-primary)" onclick="sendChat('ಮಧುಮೇಹ')">ಮಧುಮೇಹ</button>
+<button class="tech-pill" style="cursor:pointer;border-color:var(--accent-primary)" onclick="sendChat('BP')">BP</button>
+<button class="tech-pill" style="cursor:pointer;border-color:var(--accent-primary)" onclick="sendChat('ಕಣ್ಣು')">ಕಣ್ಣು</button>
+<button class="tech-pill" style="cursor:pointer;border-color:var(--accent-primary)" onclick="sendChat('ಹೃದಯ')">ಹೃದಯ</button>
+<button class="tech-pill" style="cursor:pointer;border-color:var(--accent-primary)" onclick="sendChat('Diet')">Diet</button>
+<button class="tech-pill" style="cursor:pointer;border-color:var(--accent-primary)" onclick="sendChat('Medicine')">Medicine</button>
+</div>
+<div style="display:flex;gap:8px;padding:12px 20px;border-top:1px solid var(--border-subtle)">
+<input id="chat-input" placeholder="Type your question..." style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary)" onkeydown="if(event.key==='Enter')sendChat()">
+<button class="btn-primary" onclick="sendChat()" style="padding:10px 20px">Send</button>
+</div>
+</div>
+</section>
+
+<!-- APPOINTMENT -->
+<section id="appointment" style="padding:100px 24px;max-width:1200px;margin:0 auto">
+<div style="text-align:center;margin-bottom:48px"><h2 class="section-title animate-on-scroll">Book an Appointment</h2><p class="section-subtitle animate-on-scroll">After the AI generates your referral, book directly with the right specialist.</p></div>
+<div style="display:flex;gap:8px;justify-content:center;margin-bottom:24px;flex-wrap:wrap" id="apt-stepper">
+<span class="tech-pill" style="background:rgba(0,198,255,0.15);border-color:var(--accent-primary);color:var(--accent-primary)" id="apt-step-0">1. Specialty</span>
+<span style="color:var(--text-muted)">→</span><span class="tech-pill" id="apt-step-1">2. Facility</span>
+<span style="color:var(--text-muted)">→</span><span class="tech-pill" id="apt-step-2">3. Date & Time</span>
+<span style="color:var(--text-muted)">→</span><span class="tech-pill" id="apt-step-3">4. Confirm</span>
+</div>
+<div id="apt-0" class="card" style="padding:28px">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+<div class="card card-hover" style="padding:20px;text-align:center;cursor:pointer" onclick="selectSpecialty('Endocrinology',this)"><span style="font-size:28px">🩺</span><p style="font-weight:600;margin-top:8px">Endocrinology</p></div>
+<div class="card card-hover" style="padding:20px;text-align:center;cursor:pointer" onclick="selectSpecialty('Ophthalmology',this)"><span style="font-size:28px">👁</span><p style="font-weight:600;margin-top:8px">Ophthalmology</p></div>
+<div class="card card-hover" style="padding:20px;text-align:center;cursor:pointer" onclick="selectSpecialty('Cardiology',this)"><span style="font-size:28px">❤️</span><p style="font-weight:600;margin-top:8px">Cardiology</p></div>
+<div class="card card-hover" style="padding:20px;text-align:center;cursor:pointer" onclick="selectSpecialty('General Medicine',this)"><span style="font-size:28px">🏥</span><p style="font-weight:600;margin-top:8px">General Medicine</p></div>
+<div class="card card-hover" style="padding:20px;text-align:center;cursor:pointer" onclick="selectSpecialty('Gynecology',this)"><span style="font-size:28px">👩‍⚕️</span><p style="font-weight:600;margin-top:8px">Gynecology</p></div>
+</div>
+</div>
+<div id="apt-1" class="hidden-section card" style="padding:28px">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px" id="apt-facilities"></div>
+</div>
+<div id="apt-2" class="hidden-section card" style="padding:28px">
+<div style="margin-bottom:16px"><label style="font-size:13px;color:var(--text-muted)">Select Date</label><input id="apt-date" type="date" style="padding:8px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary);margin-left:8px"></div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px" id="apt-slots">
+<button class="tab-btn" onclick="selectSlot('9:00 AM',this)">9:00 AM</button>
+<button class="tab-btn" onclick="selectSlot('10:00 AM',this)">10:00 AM</button>
+<button class="tab-btn" style="opacity:0.4;cursor:not-allowed" disabled>11:00 AM (Booked)</button>
+<button class="tab-btn" onclick="selectSlot('2:00 PM',this)">2:00 PM</button>
+<button class="tab-btn" style="opacity:0.4;cursor:not-allowed" disabled>3:00 PM (Booked)</button>
+<button class="tab-btn" onclick="selectSlot('4:00 PM',this)">4:00 PM</button>
+</div>
+</div>
+<div id="apt-3" class="hidden-section card" style="padding:28px">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px">
+<input id="apt-name" placeholder="Patient Name" style="padding:10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary)">
+<input id="apt-phone" placeholder="Phone" style="padding:10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary)">
+<input id="apt-email" placeholder="Email" style="padding:10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary)">
+<input id="apt-abha" placeholder="ABHA ID" style="padding:10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-secondary);color:var(--text-primary)">
+</div>
+<button class="btn-primary" onclick="confirmAppointment()">✓ Confirm Appointment</button>
+</div>
+<div id="apt-confirm" class="hidden-section card" style="padding:28px;border-color:rgba(34,197,94,0.3);text-align:center">
+<span style="font-size:48px">✅</span><h3 style="font-weight:700;margin:12px 0">Appointment Confirmed</h3>
+<div id="apt-confirm-details" style="color:var(--text-secondary);line-height:2"></div>
+<div style="display:flex;gap:8px;justify-content:center;margin-top:16px"><button class="btn-primary" onclick="showToast('📥 Appointment card downloaded')" style="font-size:13px;padding:8px 16px">📥 Download Card</button><button class="btn-secondary" onclick="showToast('📲 Shared via WhatsApp')" style="font-size:13px;padding:8px 16px">📲 WhatsApp</button></div>
+</div>
+</section>
+
+<!-- MAP -->
+<section id="map" style="padding:100px 24px;max-width:1200px;margin:0 auto">
+<div style="text-align:center;margin-bottom:48px"><h2 class="section-title animate-on-scroll">Find Care Nearby</h2><p class="section-subtitle animate-on-scroll">After the AI flags high risk, the ASHA worker shows exactly which hospital, how far, and whether it's open.</p></div>
+<div class="card" style="padding:4px;margin-bottom:24px;overflow:hidden;border-radius:16px">
+<iframe width="100%" height="380" style="border:0;border-radius:12px" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d250000!2d77.5!3d12.9!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1sphc%20hospital%20mandya!5e0!3m2!1sen!2sin"></iframe>
+</div>
+<p style="font-size:12px;color:var(--text-muted);text-align:center;margin-bottom:24px">Map requires internet. Offline: use facility cards below.</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px" id="phc-cards"></div>
+</section>
+
+<!-- DASHBOARD -->
+<section id="dashboard" style="padding:100px 24px;max-width:1200px;margin:0 auto">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:48px;flex-wrap:wrap;gap:16px">
+<div><h2 class="section-title animate-on-scroll">Live PHC Command Center</h2><p class="section-subtitle animate-on-scroll" style="margin-bottom:0">Real-time visibility for PHC supervisors across all active screenings.</p></div>
+<span style="display:flex;align-items:center;gap:6px;padding:6px 16px;border-radius:20px;background:rgba(34,197,94,0.1);color:var(--success);font-family:'Sora',sans-serif;font-weight:600"><span class="live-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--success)"></span> LIVE</span>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px">
+<div class="card" style="padding:20px;text-align:center"><p class="font-mono" style="font-size:2rem;font-weight:700;color:var(--accent-primary)" id="lm-active">4</p><p style="font-size:13px;color:var(--text-muted)">Active Screenings</p></div>
+<div class="card" style="padding:20px;text-align:center"><p class="font-mono" style="font-size:2rem;font-weight:700;color:var(--accent-secondary)" id="lm-queue">12</p><p style="font-size:13px;color:var(--text-muted)">Queue Length</p></div>
+<div class="card" style="padding:20px;text-align:center"><p class="font-mono" style="font-size:2rem;font-weight:700;color:var(--danger)" id="lm-alerts">2</p><p style="font-size:13px;color:var(--text-muted)">High Risk Alerts</p></div>
+<div class="card" style="padding:20px;text-align:center"><p class="font-mono" style="font-size:2rem;font-weight:700;color:var(--success)" id="lm-done">47</p><p style="font-size:13px;color:var(--text-muted)">Completed Today</p></div>
+<div class="card" style="padding:20px;text-align:center"><p class="font-mono" style="font-size:2rem;font-weight:700;color:var(--text-secondary)" id="lm-wait">8</p><p style="font-size:13px;color:var(--text-muted)">Avg Wait (min)</p></div>
+</div>
+<div class="card" style="padding:20px;margin-bottom:24px"><h4 style="font-weight:700;margin-bottom:12px">Alert Feed</h4>
+<div id="alert-feed" style="max-height:250px;overflow-y:auto;display:flex;flex-direction:column;gap:8px">
+<div style="padding:10px;border-radius:8px;border-left:3px solid var(--danger);background:rgba(239,68,68,0.04);display:flex;justify-content:space-between;font-size:13px"><span>🔴 Meena Devi — CRITICAL (8.4/10) — Moderate DR detected</span><span style="color:var(--text-muted)">2 min ago</span></div>
+<div style="padding:10px;border-radius:8px;border-left:3px solid var(--accent-secondary);background:rgba(245,158,11,0.04);display:flex;justify-content:space-between;font-size:13px"><span>🟡 Raju Kumar — MODERATE (5.7/10) — Hypertension detected</span><span style="color:var(--text-muted)">5 min ago</span></div>
+<div style="padding:10px;border-radius:8px;border-left:3px solid var(--success);background:rgba(34,197,94,0.04);display:flex;justify-content:space-between;font-size:13px"><span>🟢 Lakshmi Devi — LOW (2.1/10) — Normal screening</span><span style="color:var(--text-muted)">12 min ago</span></div>
+<div style="padding:10px;border-radius:8px;border-left:3px solid var(--danger);background:rgba(239,68,68,0.04);display:flex;justify-content:space-between;font-size:13px"><span>🔴 Shivanna — CRITICAL (7.8/10) — Uncontrolled diabetes</span><span style="color:var(--text-muted)">15 min ago</span></div>
+<div style="padding:10px;border-radius:8px;border-left:3px solid var(--accent-secondary);background:rgba(245,158,11,0.04);display:flex;justify-content:space-between;font-size:13px"><span>🟡 Parvathi — MODERATE (4.9/10) — Pre-diabetes suspected</span><span style="color:var(--text-muted)">22 min ago</span></div>
+</div>
+<button class="btn-secondary" onclick="showToast('📥 CSV report exported')" style="margin-top:12px;font-size:13px;padding:8px 16px">📥 Export Daily Report</button>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">
+<div class="card" style="padding:16px;text-align:center"><p class="font-mono" style="font-size:1.3rem;font-weight:700;color:var(--accent-primary)">45</p><p style="font-size:11px;color:var(--text-muted)">Total Beds</p></div>
+<div class="card" style="padding:16px;text-align:center"><p class="font-mono" style="font-size:1.3rem;font-weight:700;color:var(--danger)">38</p><p style="font-size:11px;color:var(--text-muted)">Occupied</p></div>
+<div class="card" style="padding:16px;text-align:center"><p class="font-mono" style="font-size:1.3rem;font-weight:700;color:var(--success)">7</p><p style="font-size:11px;color:var(--text-muted)">Available</p></div>
+<div class="card" style="padding:16px;text-align:center"><p class="font-mono" style="font-size:1.3rem;font-weight:700;color:var(--accent-secondary)">2/4</p><p style="font-size:11px;color:var(--text-muted)">ICU</p></div>
+<div class="card" style="padding:16px;text-align:center"><p class="font-mono" style="font-size:1.3rem;font-weight:700;color:var(--moderate)">12</p><p style="font-size:11px;color:var(--text-muted)">OPD Queue</p></div>
+</div>
+</section>
+<!-- CHRONICLE -->
+<section id="chronicle" style="padding:100px 24px;max-width:1000px;margin:0 auto">
+<div style="text-align:center;margin-bottom:48px"><h2 class="section-title animate-on-scroll">Patient Chronicle</h2><p class="section-subtitle animate-on-scroll">Meena's 18-month health story. The pattern the AI sees.</p></div>
+<div class="card animate-on-scroll" style="padding:20px;border-color:rgba(0,198,255,0.3);margin-bottom:32px"><p style="color:var(--text-secondary);line-height:1.7;font-size:14px"><strong style="color:var(--accent-primary)">AI Summary:</strong> Patient shows progressive worsening over 18 months. Glucose increased 50% (140→210 mg/dL). BP crossed hypertensive threshold in 2024. Retinopathy detected at latest screening. <strong style="color:var(--danger)">Trend: URGENT INTERVENTION REQUIRED.</strong></p><p style="font-size:11px;color:var(--text-muted);margin-top:8px">Generated by Sarvam AI</p></div>
+<div style="position:relative;padding-left:40px" id="timeline">
+<div style="position:absolute;left:15px;top:0;bottom:0;width:2px;background:var(--border-subtle)"></div>
+<div class="animate-on-scroll" style="position:relative;margin-bottom:32px"><div style="position:absolute;left:-33px;width:16px;height:16px;border-radius:50%;background:var(--success);border:3px solid var(--bg-primary)"></div><div class="card" style="padding:20px"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px"><span style="font-weight:700;color:var(--success)">Jan 2023 — First PHC Visit</span><span class="font-mono" style="color:var(--success);font-size:13px">Risk: 3.2</span></div><p style="color:var(--text-secondary);font-size:13px">BP: 130/85 | Glucose: 140 | HbA1c: 6.1%<br>Routine checkup. Lifestyle advice given.</p></div></div>
+<div class="animate-on-scroll" style="position:relative;margin-bottom:32px"><div style="position:absolute;left:-33px;width:16px;height:16px;border-radius:50%;background:var(--accent-secondary);border:3px solid var(--bg-primary)"></div><div class="card" style="padding:20px"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px"><span style="font-weight:700;color:var(--accent-secondary)">Jun 2023 — Follow-up Screening</span><span class="font-mono" style="color:var(--accent-secondary);font-size:13px">Risk: 4.8</span></div><p style="color:var(--text-secondary);font-size:13px">BP: 138/88 | Glucose: 165 | HbA1c: 6.8%<br>Glucose trending up. Pre-diabetes suspected. Metformin 500mg started.</p></div></div>
+<div class="animate-on-scroll" style="position:relative;margin-bottom:32px"><div style="position:absolute;left:-33px;width:16px;height:16px;border-radius:50%;background:var(--moderate);border:3px solid var(--bg-primary)"></div><div class="card" style="padding:20px"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px"><span style="font-weight:700;color:var(--moderate)">Jan 2024 — Annual Screening</span><span class="font-mono" style="color:var(--moderate);font-size:13px">Risk: 6.1</span></div><p style="color:var(--text-secondary);font-size:13px">BP: 145/92 | Glucose: 190 | HbA1c: 7.4%<br>Hypertension threshold crossed. Amlodipine started. Fundus: Normal.</p></div></div>
+<div class="animate-on-scroll" style="position:relative;margin-bottom:32px"><div style="position:absolute;left:-33px;width:16px;height:16px;border-radius:50%;background:var(--danger);border:3px solid var(--bg-primary)"></div><div class="card" style="padding:20px;border-color:rgba(239,68,68,0.3)"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px"><span style="font-weight:700;color:var(--danger)">Apr 2025 — Drishti AI Screening</span><span class="font-mono" style="color:var(--danger);font-size:13px">Risk: 8.4</span></div><p style="color:var(--text-secondary);font-size:13px">BP: 155/95 | Glucose: 210 | HbA1c: 8.2%<br>CRITICAL — Moderate DR detected. YOLOv8 + RETFound. Immediate referral.</p></div></div>
+</div>
+<div class="card animate-on-scroll" style="padding:20px;border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.04)"><p style="color:var(--accent-secondary);font-size:14px"><strong>AI Prediction:</strong> Without intervention, risk score reaches 9.5 within 6 months. Immediate action required.</p></div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section id="architecture" style="padding:100px 24px;max-width:1200px;margin:0 auto">
+<div style="text-align:center;margin-bottom:48px"><h2 class="section-title animate-on-scroll">How It Works</h2><p class="section-subtitle animate-on-scroll">A 3-layer edge AI pipeline. Role-based outputs. All on-device.</p></div>
+<div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:16px;align-items:center" class="animate-on-scroll">
+<div class="card" style="padding:24px"><h4 style="font-weight:700;color:var(--accent-primary);margin-bottom:12px">INPUT</h4><ul style="list-style:none;color:var(--text-secondary);font-size:13px;line-height:2"><li>📷 Camera — Fundus images</li><li>🎙 Voice — Kannada (Bhashini)</li><li>📊 Manual Vitals — BP, Glucose</li><li>💓 Camera PPG — Heart rate</li></ul></div>
+<div style="color:var(--accent-primary);font-size:24px">→</div>
+<div class="card" style="padding:24px;border-color:var(--border-active);box-shadow:var(--glow-cyan)"><h4 style="font-weight:700;color:var(--accent-primary);margin-bottom:12px">AI ENGINE</h4><ul style="list-style:none;color:var(--text-secondary);font-size:13px;line-height:2"><li>🧠 YOLOv8-n: Fundus (&lt;20ms)</li><li>👁 RETFound: DR grading</li><li>📊 XGBoost+SHAP (AUC 0.977)</li><li>🗣 Bhashini: 22 languages</li><li>🤖 Sarvam AI: Summaries</li><li>💓 Camera PPG: Signal proc.</li></ul></div>
+<div style="color:var(--accent-primary);font-size:24px">→</div>
+<div class="card" style="padding:24px"><h4 style="font-weight:700;color:var(--accent-primary);margin-bottom:12px">OUTPUT</h4><ul style="list-style:none;color:var(--text-secondary);font-size:13px;line-height:2"><li>🔴 Risk Score → ASHA Worker</li><li>📄 Referral Report → Hospital</li><li>📋 Research Report → Doctor</li><li>📝 Summary → Patient</li><li>💾 ABHA sync → Health Locker</li><li>🥗 Diet plan → Patient</li><li>📊 Dashboard → PHC Supervisor</li></ul></div>
+</div>
+<div style="display:flex;justify-content:center;gap:12px;margin-top:24px;flex-wrap:wrap"><span class="tech-pill" style="background:rgba(34,197,94,0.1);border-color:var(--success);color:var(--success)">✓ 100% Offline Core</span><span class="tech-pill" style="background:rgba(0,198,255,0.1);border-color:var(--accent-primary);color:var(--accent-primary)">✓ Syncs to ABHA when online</span><span class="tech-pill" style="background:rgba(245,158,11,0.1);border-color:var(--accent-secondary);color:var(--accent-secondary)">✓ Works on ₹3,000 Android</span></div>
+</section>
+<!-- TECH STACK -->
+<section id="techstack" style="padding:100px 24px;max-width:1200px;margin:0 auto">
+<div style="text-align:center;margin-bottom:48px"><h2 class="section-title animate-on-scroll">Built on India's Best AI Stack</h2><p class="section-subtitle animate-on-scroll">Every component chosen for Indian context, Indian data, Indian scale.</p></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin-bottom:24px">
+<div class="card card-hover animate-on-scroll" style="padding:24px"><span style="font-size:28px">🧠</span><h4 style="font-weight:700;margin:8px 0">YOLOv8-n</h4><p style="color:var(--text-secondary);font-size:13px;line-height:1.6">Object detection for fundus lesion localization — &lt;20ms inference, edge-deployable, TFLite INT8 for ₹3,000 phones</p><p class="font-mono" style="font-size:11px;color:var(--text-muted);margin-top:8px">ultralytics/ultralytics</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:24px"><span style="font-size:28px">👁</span><h4 style="font-weight:700;margin:8px 0">RETFound — Nature 2023</h4><p style="color:var(--text-secondary);font-size:13px;line-height:1.6">Foundation model pre-trained on 1.6M retinal images. Fine-tuned on IDRiD (Indian patient data). Published in Nature.</p><p class="font-mono" style="font-size:11px;color:var(--text-muted);margin-top:8px">openmedlab/RETFound_MAE</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:24px"><span style="font-size:28px">📊</span><h4 style="font-weight:700;margin:8px 0">XGBoost + SHAP</h4><p style="color:var(--text-secondary);font-size:13px;line-height:1.6">Gradient boosting for multi-disease risk scoring. SHAP explanations — no black box. AUC: 0.977 unified.</p><p class="font-mono" style="font-size:11px;color:var(--text-muted);margin-top:8px">slundberg/shap</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:24px"><span style="font-size:28px">🗣</span><h4 style="font-weight:700;margin:8px 0">Bhashini API — Govt of India</h4><p style="color:var(--text-secondary);font-size:13px;line-height:1.6">India's official language AI. 22 Indian languages. ASR + NMT + TTS. Backed by IITs, CDAC. Free government API.</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:24px"><span style="font-size:28px">🤖</span><h4 style="font-weight:700;margin:8px 0">Sarvam AI — Bengaluru</h4><p style="color:var(--text-secondary);font-size:13px;line-height:1.6">India's open-source LLM. 2B params, 4T Indian language tokens. Kannada/Hindi/English summaries. IndiaAI Mission.</p><p class="font-mono" style="font-size:11px;color:var(--text-muted);margin-top:8px">sarvam.ai</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:24px"><span style="font-size:28px">💾</span><h4 style="font-weight:700;margin:8px 0">ABHA / ABDM</h4><p style="color:var(--text-secondary);font-size:13px;line-height:1.6">India's national health stack. FHIR R4. 67 crore ABHA IDs. Records follow patients across all PHCs nationwide.</p><p class="font-mono" style="font-size:11px;color:var(--text-muted);margin-top:8px">sandbox.abdm.gov.in</p></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
+<div class="card" style="padding:16px"><span style="font-weight:700;color:var(--accent-primary);font-size:14px">IDRiD</span><p style="font-size:12px;color:var(--text-secondary);margin-top:4px">Indian Diabetic Retinopathy Dataset — real Indian patient fundus images, grades 0–4</p></div>
+<div class="card" style="padding:16px"><span style="font-weight:700;color:var(--accent-primary);font-size:14px">PTB-XL</span><p style="font-size:12px;color:var(--text-secondary);margin-top:4px">21,799 clinical 12-lead ECG records annotated by cardiologists</p></div>
+<div class="card" style="padding:16px"><span style="font-weight:700;color:var(--accent-primary);font-size:14px">UCI Diabetes + Heart</span><p style="font-size:12px;color:var(--text-secondary);margin-top:4px">Open benchmark datasets for training and validating risk models</p></div>
+</div>
+</section>
+<!-- IMPACT -->
+<section id="impact" style="padding:100px 24px;max-width:1200px;margin:0 auto">
+<div style="text-align:center;margin-bottom:48px"><h2 class="section-title animate-on-scroll">The Numbers That Matter</h2><p class="section-subtitle animate-on-scroll">This isn't a college project. It's a startup addressing a ₹9 crore ARR opportunity.</p></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:32px">
+<div class="card card-hover animate-on-scroll" style="padding:24px;text-align:center"><p class="font-mono" style="font-size:2.5rem;font-weight:700;color:var(--accent-primary)">1,50,000</p><p style="font-size:13px;color:var(--text-muted)">PHCs in India (addressable)</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:24px;text-align:center"><p class="font-mono" style="font-size:2.5rem;font-weight:700;color:var(--accent-secondary)">₹9Cr+</p><p style="font-size:13px;color:var(--text-muted)">Year-1 ARR (1% adoption)</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:24px;text-align:center"><p class="font-mono" style="font-size:2.5rem;font-weight:700;color:var(--success)">3 sec</p><p style="font-size:13px;color:var(--text-muted)">Retinopathy detection (offline)</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:24px;text-align:center"><p class="font-mono" style="font-size:2.5rem;font-weight:700;color:var(--danger)">0</p><p style="font-size:13px;color:var(--text-muted)">Internet required for core AI</p></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:32px">
+<div class="card animate-on-scroll" style="padding:20px"><p style="color:var(--danger);font-size:13px">ASHA with paper forms — 30 minutes</p><p style="color:var(--success);font-size:13px;margin-top:4px">→ Drishti triage — <strong>3 seconds</strong></p></div>
+<div class="card animate-on-scroll" style="padding:20px"><p style="color:var(--danger);font-size:13px">Patient travels 4 hours to city hospital</p><p style="color:var(--success);font-size:13px;margin-top:4px">→ Referral letter + nearest PHC in <strong>60 seconds</strong></p></div>
+<div class="card animate-on-scroll" style="padding:20px"><p style="color:var(--danger);font-size:13px">4.5 year average diagnosis delay</p><p style="color:var(--success);font-size:13px;margin-top:4px">→ Flagged at <strong>first contact</strong> in the village</p></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+<div class="card animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--accent-primary);margin-bottom:8px">B2B SaaS</h4><p style="font-size:13px;color:var(--text-secondary)">₹500/PHC/month — AI decision support dashboard</p></div>
+<div class="card animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--accent-primary);margin-bottom:8px">Analytics</h4><p style="font-size:13px;color:var(--text-secondary)">Anonymized population health data for pharma/insurance</p></div>
+<div class="card animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--accent-primary);margin-bottom:8px">Integration</h4><p style="font-size:13px;color:var(--text-secondary)">Diagnostic chains, PMJAY fraud detection (₹4.5B/yr lost)</p></div>
+</div>
+</section>
+<!-- PLATFORM OVERVIEW -->
+<section id="platform-overview" style="padding:100px 24px;max-width:1200px;margin:0 auto">
+<div style="text-align:center;margin-bottom:48px"><h2 class="section-title animate-on-scroll">Complete Smart Healthcare Platform</h2><p class="section-subtitle animate-on-scroll">Three connected interfaces. One intelligent healthcare system.</p></div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;position:relative" class="animate-on-scroll">
+<div class="card card-hover" style="padding:24px;text-align:center"><span style="font-size:36px">👤</span><h4 style="font-weight:700;margin:12px 0">Patient Interface</h4><p style="font-size:13px;color:var(--text-secondary)">Fast access to the right care</p></div>
+<div class="card" style="padding:24px;text-align:center;border-color:var(--border-active);box-shadow:var(--glow-cyan)"><span style="font-size:36px">🧠</span><h4 style="font-weight:700;margin:12px 0;color:var(--accent-primary)">Central AI + Data Engine</h4><div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:8px"><span class="tech-pill" style="font-size:10px">Hospital recommendation</span><span class="tech-pill" style="font-size:10px">Bed + crowd intel</span><span class="tech-pill" style="font-size:10px">AI report analysis</span><span class="tech-pill" style="font-size:10px">Appointments</span><span class="tech-pill" style="font-size:10px">Alerts</span><span class="tech-pill" style="font-size:10px">Patient records</span></div></div>
+<div class="card card-hover" style="padding:24px;text-align:center"><span style="font-size:36px">🏥</span><h4 style="font-weight:700;margin:12px 0">Hospital Management</h4><p style="font-size:13px;color:var(--text-secondary)">Command center for staff</p></div>
+</div>
+<div style="text-align:center;margin-top:16px" class="animate-on-scroll"><div class="card card-hover" style="padding:20px;display:inline-block"><span style="font-size:28px">🌾</span><h4 style="font-weight:700;margin:8px 0">ASHA Worker Interface</h4><p style="font-size:13px;color:var(--text-secondary)">Rural connectivity layer</p></div></div>
+<p style="text-align:center;font-size:13px;color:var(--text-muted);margin-top:24px;font-style:italic">Instead of one generic healthcare app, DRISHTI works as a coordinated platform connecting patients, hospitals, and frontline workers in real time.</p>
+</section>
+
+<!-- PATIENT INTERFACE -->
+<section id="patient-interface" style="padding:80px 24px;max-width:1200px;margin:0 auto">
+<div style="text-align:center;margin-bottom:48px"><h2 class="section-title animate-on-scroll">Patient Interface</h2><p class="section-subtitle animate-on-scroll">Built for users who need clarity, speed, and simple healthcare actions.</p></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+<div class="card card-hover animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--accent-primary);margin-bottom:8px">🏥 Smart Hospital Finder</h4><p style="font-size:13px;color:var(--text-secondary)">Distance, bed availability, crowd density — best hospital recommended automatically</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--danger);margin-bottom:8px">🚨 Emergency Mode</h4><p style="font-size:13px;color:var(--text-secondary)">One-tap emergency — checks nearby hospitals, beds, crowd — instant recommendation</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--accent-primary);margin-bottom:8px">📅 Appointment Booking</h4><p style="font-size:13px;color:var(--text-secondary)">Hospital + doctor + real-time slot availability + confirm</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--accent-primary);margin-bottom:8px">📥 PDF Downloads</h4><p style="font-size:13px;color:var(--text-secondary)">Appointment confirmation + medical visit summary</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--accent-primary);margin-bottom:8px">📋 Medical Records</h4><p style="font-size:13px;color:var(--text-secondary)">Previous visits, uploaded reports, referral history, prescriptions</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--accent-primary);margin-bottom:8px">🧠 AI Report Analysis</h4><p style="font-size:13px;color:var(--text-secondary)">Upload report → AI analysis → health insight (YOLO/Python ML)</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--accent-secondary);margin-bottom:8px">🔔 Smart Notifications</h4><p style="font-size:13px;color:var(--text-secondary)">Medicine reminders, food/diet alerts, follow-up reminders</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--success);margin-bottom:8px">🌾 Rural Support</h4><p style="font-size:13px;color:var(--text-secondary)">ASHA worker help, government schemes, assisted booking</p></div>
+</div>
+<p style="text-align:center;font-size:13px;color:var(--text-muted);margin-top:20px;font-style:italic">The patient interface only shows what the user truly needs in the moment.</p>
+</section>
+
+<!-- HOSPITAL INTERFACE -->
+<section id="hospital-interface" style="padding:80px 24px;max-width:1200px;margin:0 auto">
+<div style="text-align:center;margin-bottom:48px"><h2 class="section-title animate-on-scroll">Hospital Management Interface</h2><p class="section-subtitle animate-on-scroll">Built to help hospitals manage people, pressure, and priorities in real time.</p></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+<div class="card card-hover animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--accent-primary);margin-bottom:8px">🛏 Bed Management</h4><p style="font-size:13px;color:var(--text-secondary)">Ward-level: total/occupied/available beds with status colors</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--moderate);margin-bottom:8px">📹 Crowd Monitoring</h4><p style="font-size:13px;color:var(--text-secondary)">OpenCV crowd detection → Low/Medium/High density alerts</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--danger);margin-bottom:8px">📋 Patient Requests</h4><p style="font-size:13px;color:var(--text-secondary)">Emergency, appointments, AI-flagged high-risk — severity tagged</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--accent-secondary);margin-bottom:8px">⚡ Emergency Priority</h4><p style="font-size:13px;color:var(--text-secondary)">Ordered queue — AI risk score + manual triage logic</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--accent-primary);margin-bottom:8px">👤 Patient Data Access</h4><p style="font-size:13px;color:var(--text-secondary)">Quick-access: name, age, case history, reports, risk label</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--accent-primary);margin-bottom:8px">📊 Analytics & Insights</h4><p style="font-size:13px;color:var(--text-secondary)">Patient inflow, wait time, bed utilization, emergency load</p></div>
+</div>
+<p style="text-align:center;font-size:13px;color:var(--text-muted);margin-top:20px;font-style:italic">This dashboard helps hospitals act earlier, reduce chaos, and prepare before the patient arrives.</p>
+</section>
+
+<!-- ASHA INTERFACE -->
+<section id="asha-interface" style="padding:80px 24px;max-width:1200px;margin:0 auto">
+<div style="text-align:center;margin-bottom:48px"><h2 class="section-title animate-on-scroll">ASHA Worker Interface</h2><p class="section-subtitle animate-on-scroll">A practical bridge between village-level first contact and formal healthcare systems.</p></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+<div class="card card-hover animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--accent-primary);margin-bottom:8px">👤 Limited Patient View</h4><p style="font-size:13px;color:var(--text-secondary)">Patient basics, symptoms, risk level, medicine reminders, appointment status — limited access, not full admin</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--success);margin-bottom:8px">🏛 Government Schemes</h4><p style="font-size:13px;color:var(--text-secondary)">Ayushman Bharat, state health schemes, transport/referral assistance</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--accent-secondary);margin-bottom:8px">📅 Assisted Booking</h4><p style="font-size:13px;color:var(--text-secondary)">Guided flow: enter details → book appointment → explain next steps → share recommendation</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:20px"><h4 style="font-weight:700;color:var(--accent-primary);margin-bottom:8px">🔄 Rural Follow-Up</h4><p style="font-size:13px;color:var(--text-secondary)">Check attendance, remind medicines, explain diet, help follow-up booking</p></div>
+</div>
+<p style="text-align:center;font-size:13px;color:var(--text-muted);margin-top:20px;font-style:italic">DRISHTI does not replace ASHA workers — it strengthens their role with real-time intelligence.</p>
+</section>
+
+<!-- PLATFORM WORKFLOW -->
+<section id="platform-workflow" style="padding:80px 24px;max-width:1200px;margin:0 auto">
+<div style="text-align:center;margin-bottom:48px"><h2 class="section-title animate-on-scroll">How the Platform Works Together</h2><p class="section-subtitle animate-on-scroll">One request triggers coordinated action across the whole system.</p></div>
+<div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center" class="animate-on-scroll">
+<div class="card" style="padding:16px 20px;text-align:center;min-width:140px"><span style="font-size:20px">1️⃣</span><p style="font-size:12px;color:var(--text-secondary);margin-top:4px">Patient sends request</p></div>
+<div style="color:var(--accent-primary);display:flex;align-items:center">→</div>
+<div class="card" style="padding:16px 20px;text-align:center;min-width:140px"><span style="font-size:20px">2️⃣</span><p style="font-size:12px;color:var(--text-secondary);margin-top:4px">System analyzes location, beds, crowd</p></div>
+<div style="color:var(--accent-primary);display:flex;align-items:center">→</div>
+<div class="card" style="padding:16px 20px;text-align:center;min-width:140px"><span style="font-size:20px">3️⃣</span><p style="font-size:12px;color:var(--text-secondary);margin-top:4px">Best hospital suggested</p></div>
+<div style="color:var(--accent-primary);display:flex;align-items:center">→</div>
+<div class="card" style="padding:16px 20px;text-align:center;min-width:140px"><span style="font-size:20px">4️⃣</span><p style="font-size:12px;color:var(--text-secondary);margin-top:4px">Hospital receives request</p></div>
+<div style="color:var(--accent-primary);display:flex;align-items:center">→</div>
+<div class="card" style="padding:16px 20px;text-align:center;min-width:140px"><span style="font-size:20px">5️⃣</span><p style="font-size:12px;color:var(--text-secondary);margin-top:4px">Staff prepares triage</p></div>
+<div style="color:var(--accent-primary);display:flex;align-items:center">→</div>
+<div class="card" style="padding:16px 20px;text-align:center;min-width:140px"><span style="font-size:20px">6️⃣</span><p style="font-size:12px;color:var(--text-secondary);margin-top:4px">Booking + PDF confirmed</p></div>
+<div style="color:var(--accent-primary);display:flex;align-items:center">→</div>
+<div class="card" style="padding:16px 20px;text-align:center;min-width:140px"><span style="font-size:20px">7️⃣</span><p style="font-size:12px;color:var(--text-secondary);margin-top:4px">Follow-up continues</p></div>
+</div>
+<p style="text-align:center;font-size:14px;color:var(--accent-primary);margin-top:24px;font-weight:600">The strength of the system is coordination — not just prediction.</p>
+</section>
+
+<!-- MERN ARCHITECTURE -->
+<section id="mern-architecture" style="padding:80px 24px;max-width:1200px;margin:0 auto">
+<div style="text-align:center;margin-bottom:48px"><h2 class="section-title animate-on-scroll">MERN + Python ML Architecture</h2><p class="section-subtitle animate-on-scroll">How this healthcare platform can move from demo to deployment.</p></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:24px" class="animate-on-scroll">
+<div><h3 style="font-weight:700;margin-bottom:16px;color:var(--accent-primary)">Architecture Layers</h3>
+<div class="card" style="padding:16px;margin-bottom:12px;border-left:3px solid var(--accent-primary)"><h4 style="font-weight:700;font-size:14px">Layer 1 — Frontend (React)</h4><p style="font-size:12px;color:var(--text-secondary)">Patient Interface | Hospital Dashboard | ASHA Worker Interface</p></div>
+<div class="card" style="padding:16px;margin-bottom:12px;border-left:3px solid var(--success)"><h4 style="font-weight:700;font-size:14px">Layer 2 — Backend (Node.js + Express)</h4><p style="font-size:12px;color:var(--text-secondary)">Auth, role-based APIs, hospital search, appointments, notifications</p></div>
+<div class="card" style="padding:16px;margin-bottom:12px;border-left:3px solid var(--accent-secondary)"><h4 style="font-weight:700;font-size:14px">Layer 3 — Database (MongoDB)</h4><p style="font-size:12px;color:var(--text-secondary)">Users, hospitals, beds, appointments, reports, reminders, schemes</p></div>
+<div class="card" style="padding:16px;border-left:3px solid var(--danger)"><h4 style="font-weight:700;font-size:14px">Layer 4 — ML Services (Python)</h4><p style="font-size:12px;color:var(--text-secondary)">YOLO report analysis, OpenCV crowd detection, FastAPI wrapper APIs</p></div>
+</div>
+<div><h3 style="font-weight:700;margin-bottom:16px;color:var(--accent-primary)">Project Structure</h3>
+<div class="card" style="padding:20px"><pre class="font-mono" style="font-size:11px;color:var(--text-secondary);line-height:1.8;overflow-x:auto">healthcare-platform/
+├── client/                  // React Frontend
+│   ├── src/
+│   │   ├── components/     // Reusable UI
+│   │   ├── pages/
+│   │   │   ├── user/       // Patient
+│   │   │   ├── hospital/   // Dashboard
+│   │   │   ├── asha/       // ASHA Worker
+│   │   ├── services/       // API (Axios)
+│   │   └── App.js
+├── server/                  // Node.js + Express
+│   ├── controllers/
+│   ├── routes/
+│   ├── models/             // MongoDB schemas
+│   ├── middleware/
+│   └── server.js
+├── ml-services/             // Python ML
+│   ├── yolo_model/
+│   ├── crowd_detection/
+│   ├── api/                // FastAPI
+│   └── requirements.txt
+└── database/</pre></div>
+</div>
+</div>
+<p style="text-align:center;font-size:12px;color:var(--text-muted);margin-top:20px;font-style:italic">This website is a product showcase. The MERN + Python stack shown here is the real implementation blueprint.</p>
+</section>
+
+<!-- ADVANTAGES -->
+<section id="advantages" style="padding:80px 24px;max-width:1200px;margin:0 auto">
+<div style="text-align:center;margin-bottom:48px"><h2 class="section-title animate-on-scroll">Why This Platform Is Different</h2></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
+<div class="card card-hover animate-on-scroll" style="padding:24px;text-align:center"><span style="font-size:28px">🧩</span><h4 style="font-weight:700;margin:8px 0">Modular MERN</h4><p style="font-size:13px;color:var(--text-secondary)">Clean separation of concerns</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:24px;text-align:center"><span style="font-size:28px">⚡</span><h4 style="font-weight:700;margin:8px 0">Real-time Intel</h4><p style="font-size:13px;color:var(--text-secondary)">Instant processing and updates</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:24px;text-align:center"><span style="font-size:28px">🧠</span><h4 style="font-weight:700;margin:8px 0">AI + CV Integration</h4><p style="font-size:13px;color:var(--text-secondary)">YOLO + OpenCV + XGBoost</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:24px;text-align:center"><span style="font-size:28px">🏥</span><h4 style="font-weight:700;margin:8px 0">Role-based Dashboards</h4><p style="font-size:13px;color:var(--text-secondary)">Patient, Hospital, ASHA</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:24px;text-align:center"><span style="font-size:28px">🌾</span><h4 style="font-weight:700;margin:8px 0">Rural Inclusion</h4><p style="font-size:13px;color:var(--text-secondary)">Offline-first, low-literacy support</p></div>
+</div>
+</section>
+
+<!-- SUMMARY BAND -->
+<section id="summary-band" style="padding:80px 24px;max-width:1200px;margin:0 auto">
+<div style="text-align:center;margin-bottom:32px"><h2 class="section-title animate-on-scroll">From Emergency to Follow-Up</h2><p class="section-subtitle animate-on-scroll">One Connected Care Journey</p></div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center" class="animate-on-scroll">
+<div class="card" style="padding:12px 16px;text-align:center"><span class="font-mono" style="color:var(--accent-primary)">1</span><p style="font-size:11px;color:var(--text-secondary)">Patient raises request</p></div>
+<div class="card" style="padding:12px 16px;text-align:center"><span class="font-mono" style="color:var(--accent-primary)">2</span><p style="font-size:11px;color:var(--text-secondary)">System checks beds+crowd</p></div>
+<div class="card" style="padding:12px 16px;text-align:center"><span class="font-mono" style="color:var(--accent-primary)">3</span><p style="font-size:11px;color:var(--text-secondary)">Best hospital recommended</p></div>
+<div class="card" style="padding:12px 16px;text-align:center"><span class="font-mono" style="color:var(--accent-primary)">4</span><p style="font-size:11px;color:var(--text-secondary)">Hospital gets alert</p></div>
+<div class="card" style="padding:12px 16px;text-align:center"><span class="font-mono" style="color:var(--accent-primary)">5</span><p style="font-size:11px;color:var(--text-secondary)">Care prioritized</p></div>
+<div class="card" style="padding:12px 16px;text-align:center"><span class="font-mono" style="color:var(--accent-primary)">6</span><p style="font-size:11px;color:var(--text-secondary)">Reports + follow-up</p></div>
+</div>
+<p style="text-align:center;font-size:14px;color:var(--accent-primary);margin-top:24px;font-weight:600">Same AI core. Three interfaces. Real healthcare coordination.</p>
+</section>
+
+<!-- TEAM -->
+<section id="team" style="padding:100px 24px;max-width:1200px;margin:0 auto">
+<div style="text-align:center;margin-bottom:48px"><h2 class="section-title animate-on-scroll">Team Cognivex</h2><p class="section-subtitle animate-on-scroll">Dr. Ambedkar Institute of Technology, Bangalore | VTU | CSBS + ECE</p></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:32px">
+<div class="card card-hover animate-on-scroll" style="padding:24px;text-align:center"><div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:24px">PM</div><h4 style="font-weight:700">Prajwal M R</h4><p style="font-size:13px;color:var(--text-secondary)">Project Lead | Data Engineering & AI Systems | CSBS</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:24px;text-align:center"><div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:24px">H</div><h4 style="font-weight:700">Harshith</h4><p style="font-size:13px;color:var(--text-secondary)">UI/UX + Animations + 3D Design | ECE</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:24px;text-align:center"><div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:24px">HP</div><h4 style="font-weight:700">Hemanth M P</h4><p style="font-size:13px;color:var(--text-secondary)">Pitch & Strategy | ECE</p></div>
+<div class="card card-hover animate-on-scroll" style="padding:24px;text-align:center"><div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:24px">TK</div><h4 style="font-weight:700">Tejas Kumar M S</h4><p style="font-size:13px;color:var(--text-secondary)">ML Engineer | YOLOv8 + Voice AI | ECE</p></div>
+</div>
+<div style="text-align:center;color:var(--text-muted);font-size:13px"><p>Built in 36 hours | Vibeathon 2025, Mysore | Track 1 — Vectorflow Club | Domain 01: Healthcare</p><p style="margin-top:4px">Powered by: YOLOv8 · RETFound · XGBoost+SHAP · Bhashini · Sarvam AI · ABHA · Anime.js</p></div>
+</section>
+
+<!-- FOOTER -->
+<footer style="padding:48px 24px;border-top:1px solid var(--border-subtle);text-align:center">
+<p style="font-family:'Sora',sans-serif;font-weight:700;color:var(--accent-primary);font-size:1.2rem;margin-bottom:8px">🔬 Drishti Health</p>
+<p style="color:var(--text-secondary);margin-bottom:16px">Bringing AI diagnostics to every village in India</p>
+<p style="color:var(--text-muted);font-size:13px;margin-bottom:8px">🆘 Emergency? Call 108 — India's free ambulance service</p>
+<p style="color:var(--text-muted);font-size:11px;max-width:600px;margin:0 auto 12px">AI-assisted screening tool. Not a substitute for clinical diagnosis. Human-in-loop design — AI recommends, doctor decides. All data processed locally. ABHA sync requires patient consent.</p>
+<p style="color:var(--text-muted);font-size:11px">© 2025 Team Cognivex | Vibeathon Mysore | Track 1 Healthcare</p>
+</footer>
+
+<script src="app.js"></script>
+<script>
+(function(){var c=document.getElementById('hero-dots');for(var i=0;i<20;i++){var d=document.createElement('div');d.className='hero-dot';d.style.left=Math.random()*100+'%';d.style.top=Math.random()*100+'%';d.style.animationDuration=(8+Math.random()*12)+'s';d.style.animationDelay=(Math.random()*5)+'s';c.appendChild(d)}})();
+function animateCounters(){anime({targets:{val:0},val:77,round:1,duration:2000,easing:'easeOutExpo',update:function(a){document.getElementById('counter1').textContent=a.animations[0].currentValue}});anime({targets:{val:0},val:4.5,round:10,duration:2000,easing:'easeOutExpo',update:function(a){document.getElementById('counter2').textContent=parseFloat(a.animations[0].currentValue).toFixed(1)}});anime({targets:{val:0},val:5,round:1,duration:2000,easing:'easeOutExpo',update:function(a){document.getElementById('counter3').textContent=a.animations[0].currentValue}})}
+var observer=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');if(e.target.id==='hero-counters')animateCounters()}})},{threshold:0.2});
+document.querySelectorAll('.animate-on-scroll,#hero-counters').forEach(function(el){observer.observe(el)});
+var navObserver=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){document.querySelectorAll('.nav-link').forEach(function(l){l.classList.remove('active')});var link=document.querySelector('.nav-link[href="#'+e.target.id+'"]');if(link)link.classList.add('active')}})},{threshold:0.3});
+document.querySelectorAll('section[id]').forEach(function(s){navObserver.observe(s)});
+function showToast(msg){var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.classList.add('show')},50);setTimeout(function(){t.classList.remove('show');setTimeout(function(){t.remove()},400)},3000)}
+</script>
+</body>
+</html>
